@@ -1,7 +1,6 @@
 package lingo
 
 import (
-	"reflect"
 	"sort"
 )
 
@@ -24,27 +23,6 @@ func (s sorter[T, K]) Less(i, j int) bool {
 	return s.comparer(s.keys[i], s.keys[j])
 }
 
-func defaultSort[T any](t1, t2 T) bool {
-	switch reflect.TypeOf(t1).Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return reflect.ValueOf(t1).Int() < reflect.ValueOf(t2).Int()
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return reflect.ValueOf(t1).Uint() < reflect.ValueOf(t2).Uint()
-	case reflect.Float32, reflect.Float64:
-		return reflect.ValueOf(t1).Float() < reflect.ValueOf(t2).Float()
-	case reflect.String:
-		return reflect.ValueOf(t1).String() < reflect.ValueOf(t2).String()
-	case reflect.Bool:
-		// t1 < t2 when: t1 is false, and t2 is true
-		v1, v2 := reflect.ValueOf(t1).Bool(), reflect.ValueOf(t2).Bool()
-		if !v1 && v2 {
-			return true
-		}
-		return false
-	}
-	return false
-}
-
 func NewSorter[T any, K any](origin []T, source []K, comparer Comparer[K]) sorter[T, K] {
 	res := sorter[T, K]{
 		origin: origin,
@@ -53,7 +31,7 @@ func NewSorter[T any, K any](origin []T, source []K, comparer Comparer[K]) sorte
 	var comp Comparer[K] = comparer
 	if comparer == nil {
 		comp = func(t1, t2 K) bool {
-			return defaultSort(t1, t2)
+			return defaultLessComparer(t1, t2)
 		}
 	}
 
