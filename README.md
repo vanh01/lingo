@@ -106,43 +106,44 @@ The following table classifies each supported method, there are two types: Immed
 - Immediate execution terminates an enumerable and returns the result
 - Chain execution can be called many times.
 
-| Standard query operator | Return type | Immediate execution	| Chain execution |
-|----|----|----|----|
-|Min|T|x||
-|Max|T|x||
-|Sum|Number|x||
-|Average|float64|x||
-|Count|int64|x||
-|ToSlice|[]T|x||
-|ToMap|map[any]any|x||
-|Concat|Enumerable[T]||x|
-|Where|Enumerable[T]||x|
-|GroupBy|Enumerable[any]||x|
-|Join|Enumerable[any]||x|
-|Skip|Enumerable[T]||x|
-|SkipWhile|Enumerable[T]||x|
-|Take|Enumerable[T]||x|
-|TakeWhile|Enumerable[T]||x|
-|Select|Enumerable[any]||x|
-|SelectMany|Enumerable[any]||x|
-|Zip|Enumerable[any]||x|
-|All|bool|x||
-|Any|bool|x||
-|Contains|bool|x||
-|FirstOrNil|T|x||
-|FirstOrDefault|T|x||
-|LastOrNil|T|x||
-|LastOrDefault|T|x||
-|ElementAtOrNil|T|x||
-|ElementAtOrDefault|T|x||
-|Distinct|Enumerable[T]||x|
-|DistinctBy|Enumerable[T]||x|
-|Except|Enumerable[T]||x|
-|Intersect|Enumerable[T]||x|
-|Union|Enumerable[T]||x|
-|OrderBy|Enumerable[T]||x|
-|OrderByDescending|Enumerable[T]||x|
-|Reverse|Enumerable[T]||x|
+| Standard query operator | Return type | Immediate execution | Chain execution |
+|-|-|-|-|
+|[Min](#min)|T|x||
+|[Max](#max)|T|x||
+|[Sum](#sum)|Number|x||
+|[Average](#average)|float64|x||
+|[Count](#count)|int64|x||
+|[Aggregate](#aggregate)|any|x||
+|[ToSlice](#toslice)|[]T|x||
+|[ToMap](#tomap)|map[any]any|x||
+|[Concat](#concat)|Enumerable[T]||x|
+|[Where](#filtering-data)|Enumerable[T]||x|
+|[GroupBy](#grouping-data)|Enumerable[any]||x|
+|[Join](#join-operations)|Enumerable[any]||x|
+|[Skip](#skip)|Enumerable[T]||x|
+|[SkipWhile](#skipwhile)|Enumerable[T]||x|
+|[Take](#take)|Enumerable[T]||x|
+|[TakeWhile](#takewhile)|Enumerable[T]||x|
+|[Select](#select)|Enumerable[any]||x|
+|[SelectMany](#selectmany)|Enumerable[any]||x|
+|[Zip](#zip)|Enumerable[any]||x|
+|[All](#all)|bool|x||
+|[Any](#any)|bool|x||
+|[Contains](#contains)|bool|x||
+|[FirstOrNil](#firstornil)|T|x||
+|[FirstOrDefault](#firstordefault)|T|x||
+|[LastOrNil](#lastornil)|T|x||
+|[LastOrDefault](#lastordefault)|T|x||
+|[ElementAtOrNil](#elementatornil)|T|x||
+|[ElementAtOrDefault](#elementatordefault)|T|x||
+|[Distinct](#distinct)|Enumerable[T]||x|
+|[DistinctBy](#distinctby)|Enumerable[T]||x|
+|[Except](#except)|Enumerable[T]||x|
+|[Intersect](#intersect)|Enumerable[T]||x|
+|[Union](#union)|Enumerable[T]||x|
+|[OrderBy](#orderby)|Enumerable[T]||x|
+|[OrderByDescending](#orderbydescending)|Enumerable[T]||x|
+|[Reverse](#reverse)|Enumerable[T]||x|
 
 
 
@@ -424,6 +425,23 @@ enumerable := lingo.Range(1, 100)
 count := enumerable.Count() // 100
 ```
 
+#### Aggregate
+Aggregate applies an accumulator function over a sequence. The specified seed value is used as the initial accumulator value, and the specified function is used to select the result value.
+
+Example:
+```go
+sentence := "the quick brown fox jumps over the lazy dog"
+word := strings.Split(sentence, " ")
+reversed := lingo.AsEnumerable(word).Aggregate(
+	"",
+	func(a any, s string) any {
+		return s + " " + a.(string)
+	},
+	nil,
+)
+fmt.Println(reversed)
+// Result: "dog lazy the over jumps fox brown quick the"
+```
 
 ### Set operations
 #### Distinct
