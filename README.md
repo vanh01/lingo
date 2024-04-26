@@ -98,6 +98,53 @@ func main() {
 
 ## Features
 
+### Classification table
+The following table classifies each supported method, there are two types: Immediate execution and Chain execution.
+
+- Immediate execution terminates an enumerable and returns the result
+- Chain execution can be called many times.
+
+| Standard query operator | Return type | Immediate execution	| Chain execution |
+|----|----|----|----|
+|Min|T|x||
+|Max|T|x||
+|Sum|Number|x||
+|Average|float64|x||
+|Count|int64|x||
+|ToSlice|[]T|x||
+|ToMap|map[any]any|x||
+|Concat|Enumerable[T]||x|
+|Where|Enumerable[T]||x|
+|GroupBy|Enumerable[any]||x|
+|Join|Enumerable[any]||x|
+|Skip|Enumerable[T]||x|
+|SkipWhile|Enumerable[T]||x|
+|Take|Enumerable[T]||x|
+|TakeWhile|Enumerable[T]||x|
+|Select|Enumerable[any]||x|
+|SelectMany|Enumerable[any]||x|
+|Zip|Enumerable[any]||x|
+|All|bool|x||
+|Any|bool|x||
+|Contains|bool|x||
+|FirstOrNil|T|x||
+|FirstOrDefault|T|x||
+|LastOrNil|T|x||
+|LastOrDefault|T|x||
+|ElementAtOrNil|T|x||
+|ElementAtOrDefault|T|x||
+|Distinct|Enumerable[T]||x|
+|DistinctBy|Enumerable[T]||x|
+|Except|Enumerable[T]||x|
+|Intersect|Enumerable[T]||x|
+|Union|Enumerable[T]||x|
+|OrderBy|Enumerable[T]||x|
+|OrderByDescending|Enumerable[T]||x|
+|Reverse|Enumerable[T]||x|
+
+
+
+
 I have defined the Student structure for the following examples
 
 ```go
