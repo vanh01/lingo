@@ -1,6 +1,9 @@
 package lingo
 
-import "reflect"
+import (
+	"reflect"
+	"unsafe"
+)
 
 // ToSlice converts the iterator into a slice
 func (e Enumerable[T]) ToSlice() []T {
@@ -26,9 +29,18 @@ func SliceAnyToT[T any](source interface{}) []T {
 	switch reflect.TypeOf(source).Kind() {
 	case reflect.Slice:
 		sourceValue := reflect.ValueOf(source)
+		var temp T
 		t = make([]T, sourceValue.Len())
 		for i := 0; i < sourceValue.Len(); i++ {
-			t[i] = sourceValue.Index(i).Interface().(T)
+			value := sourceValue.Index(i).Interface()
+			switch {
+			case isNumber(temp):
+				t[i] = defaultConvertToNumber[T](value)
+			case reflect.TypeOf(temp) == reflect.TypeOf(value):
+				t[i] = value.(T)
+			default:
+				t[i] = *(*T)(unsafe.Pointer(&value))
+			}
 		}
 	}
 	return t

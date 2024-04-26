@@ -1,5 +1,10 @@
 package lingo
 
+import (
+	"reflect"
+	"unsafe"
+)
+
 type Enumerable[T any] struct {
 	iterator <-chan T
 }
@@ -32,8 +37,16 @@ func AsEnumerableTFromAny[T any](e Enumerable[any]) Enumerable[T] {
 
 	go func() {
 		defer close(out)
+		var temp T
 		for value := range e.iterator {
-			out <- value.(T)
+			switch {
+			case isNumber(temp):
+				out <- defaultConvertToNumber[T](value)
+			case reflect.TypeOf(temp) == reflect.TypeOf(value):
+				out <- value.(T)
+			default:
+				out <- *(*T)(unsafe.Pointer(&value))
+			}
 		}
 	}()
 
@@ -50,8 +63,16 @@ func AsEnumerableTFromSliceAny[T any](a []any) Enumerable[T] {
 
 	go func() {
 		defer close(out)
+		var temp T
 		for _, value := range a {
-			out <- value.(T)
+			switch {
+			case isNumber(temp):
+				out <- defaultConvertToNumber[T](value)
+			case reflect.TypeOf(temp) == reflect.TypeOf(value):
+				out <- value.(T)
+			default:
+				out <- *(*T)(unsafe.Pointer(&value))
+			}
 		}
 	}()
 

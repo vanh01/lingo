@@ -1,6 +1,8 @@
 package lingo
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // SingleSelector represents a function that converts an object under T type to another object
 type SingleSelector[T any] func(T) any
@@ -45,8 +47,208 @@ func isFloat(i any) bool {
 	return false
 }
 
-func isNumber[T any](t T) bool {
-	return isInt(t) || isUint(t) || isFloat(t)
+func isNumber(i any) bool {
+	return isInt(i) || isUint(i) || isFloat(i)
+}
+
+// convert number type to int
+func floatToActualInt[T any](value any) T {
+	var t T
+	valueFloat64 := reflect.ValueOf(value).Float()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Int:
+		t = reflect.ValueOf(int(valueFloat64)).Interface().(T)
+	case reflect.Int8:
+		t = reflect.ValueOf(int8(valueFloat64)).Interface().(T)
+	case reflect.Int16:
+		t = reflect.ValueOf(int16(valueFloat64)).Interface().(T)
+	case reflect.Int32:
+		t = reflect.ValueOf(int32(valueFloat64)).Interface().(T)
+	case reflect.Int64:
+		t = reflect.ValueOf(int64(valueFloat64)).Interface().(T)
+	}
+	return t
+}
+func uintToActualInt[T any](value any) T {
+	var t T
+	valueUint64 := reflect.ValueOf(value).Uint()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Int:
+		t = reflect.ValueOf(int(valueUint64)).Interface().(T)
+	case reflect.Int8:
+		t = reflect.ValueOf(int8(valueUint64)).Interface().(T)
+	case reflect.Int16:
+		t = reflect.ValueOf(int16(valueUint64)).Interface().(T)
+	case reflect.Int32:
+		t = reflect.ValueOf(int32(valueUint64)).Interface().(T)
+	case reflect.Int64:
+		t = reflect.ValueOf(int64(valueUint64)).Interface().(T)
+	}
+	return t
+}
+func intToActualInt[T any](value any) T {
+	var t T
+	valueInt64 := reflect.ValueOf(value).Int()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Int:
+		t = reflect.ValueOf(int(valueInt64)).Interface().(T)
+	case reflect.Int8:
+		t = reflect.ValueOf(int8(valueInt64)).Interface().(T)
+	case reflect.Int16:
+		t = reflect.ValueOf(int16(valueInt64)).Interface().(T)
+	case reflect.Int32:
+		t = reflect.ValueOf(int32(valueInt64)).Interface().(T)
+	case reflect.Int64:
+		t = reflect.ValueOf(valueInt64).Interface().(T)
+	}
+	return t
+}
+
+// convert number type to int
+func floatToActualUint[T any](value any) T {
+	var t T
+	valueFloat64 := reflect.ValueOf(value).Float()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Uint:
+		t = reflect.ValueOf(uint(valueFloat64)).Interface().(T)
+	case reflect.Uint8:
+		t = reflect.ValueOf(uint8(valueFloat64)).Interface().(T)
+	case reflect.Uint16:
+		t = reflect.ValueOf(uint16(valueFloat64)).Interface().(T)
+	case reflect.Uint32:
+		t = reflect.ValueOf(uint32(valueFloat64)).Interface().(T)
+	case reflect.Uint64:
+		t = reflect.ValueOf(uint64(valueFloat64)).Interface().(T)
+	}
+	return t
+}
+func uintToActualUint[T any](value any) T {
+	var t T
+	valueUint64 := reflect.ValueOf(value).Uint()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Uint:
+		t = reflect.ValueOf(uint(valueUint64)).Interface().(T)
+	case reflect.Uint8:
+		t = reflect.ValueOf(uint8(valueUint64)).Interface().(T)
+	case reflect.Uint16:
+		t = reflect.ValueOf(uint16(valueUint64)).Interface().(T)
+	case reflect.Uint32:
+		t = reflect.ValueOf(uint32(valueUint64)).Interface().(T)
+	case reflect.Uint64:
+		t = reflect.ValueOf(valueUint64).Interface().(T)
+	}
+	return t
+}
+func intToActualUint[T any](value any) T {
+	var t T
+	valueInt64 := reflect.ValueOf(value).Int()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Uint:
+		t = reflect.ValueOf(uint(valueInt64)).Interface().(T)
+	case reflect.Uint8:
+		t = reflect.ValueOf(uint8(valueInt64)).Interface().(T)
+	case reflect.Uint16:
+		t = reflect.ValueOf(uint16(valueInt64)).Interface().(T)
+	case reflect.Uint32:
+		t = reflect.ValueOf(uint32(valueInt64)).Interface().(T)
+	case reflect.Uint64:
+		t = reflect.ValueOf(uint64(valueInt64)).Interface().(T)
+	}
+	return t
+}
+
+// convert number type to float
+func intToActualFloat[T any](value any) T {
+	var t T
+	valueInt64 := reflect.ValueOf(value).Int()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Float32:
+		t = reflect.ValueOf(float32(valueInt64)).Interface().(T)
+	case reflect.Float64:
+		t = reflect.ValueOf(float64(valueInt64)).Interface().(T)
+	}
+	return t
+}
+func uintToActualFloat[T any](value any) T {
+	var t T
+	valueInt64 := reflect.ValueOf(value).Uint()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Float32:
+		t = reflect.ValueOf(float32(valueInt64)).Interface().(T)
+	case reflect.Float64:
+		t = reflect.ValueOf(float64(valueInt64)).Interface().(T)
+	}
+	return t
+}
+func floatToActualFloat[T any](value any) T {
+	var t T
+	valueFloat64 := reflect.ValueOf(value).Float()
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Float32:
+		t = reflect.ValueOf(float32(valueFloat64)).Interface().(T)
+	case reflect.Float64:
+		t = reflect.ValueOf(valueFloat64).Interface().(T)
+	}
+	return t
+}
+
+// defaultConvertToInt
+func defaultConvertToInt[T any](value any) T {
+	var t T
+
+	switch {
+	case isFloat(value):
+		t = floatToActualInt[T](value)
+	case isUint(value):
+		t = uintToActualInt[T](value)
+	case isInt(value):
+		t = intToActualInt[T](value)
+	}
+	return t
+}
+
+// defaultConvertToUint
+func defaultConvertToUint[T any](value any) T {
+	var t T
+
+	switch {
+	case isFloat(value):
+		t = floatToActualUint[T](value)
+	case isUint(value):
+		t = uintToActualUint[T](value)
+	case isInt(value):
+		t = intToActualUint[T](value)
+	}
+	return t
+}
+
+// defaultConvertToFloat
+func defaultConvertToFloat[T any](value any) T {
+	var t T
+
+	switch {
+	case isInt(value):
+		t = intToActualFloat[T](value)
+	case isUint(value):
+		t = uintToActualFloat[T](value)
+	case isFloat(value):
+		t = floatToActualFloat[T](value)
+	}
+	return t
+}
+
+// defaultConvertToNumber
+func defaultConvertToNumber[T any](value any) T {
+	var t T
+	switch {
+	case isInt(t):
+		t = defaultConvertToInt[T](value)
+	case isUint(t):
+		t = defaultConvertToUint[T](value)
+	case isFloat(t):
+		t = defaultConvertToFloat[T](value)
+	}
+	return t
 }
 
 // defaultLessComparer is the default compare when the first one is smaller than the second one
