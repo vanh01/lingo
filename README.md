@@ -5,8 +5,11 @@
 lingo is a library written in Go. It is LinQ in .NET for Go. It will help the array processing code more neat.
 
 **The key features of lingo are:**
+- [Initialize enumerable](#initialize-enumerable)
+- [Retrieve data](#retrieve-data)
 - [Filtering data](#filtering-data)
 - [Projection operations](#projection-operations)
+- [Aggregation operations](#aggregation-operations)
 - [Set operations](#set-operations)
 - [Sorting data](#sorting-data)
 - [Quantifier operations](#quantifier-operations)
@@ -111,6 +114,111 @@ type Class struct {
 }
 ```
 Following are all the examples related to the supported methods in this library.
+
+### Initialize enumerable
+#### AsEnumerable
+AsEnumerable creates a new Enumerable from a silce of specific type.
+
+Example:
+```go
+enumerable := lingo.AsEnumerable([]int{1, 2, 3})
+```
+#### AsEnumerableTFromAny
+AsEnumerableTFromAny creates a new Enumerable of specific type from Enumerable of any type, this method will be useful after using projection operations.
+
+Example:
+```go
+enumerable := lingo.AsEnumerable([]any{1, 2, 3})
+enumerableInt := lingo.AsEnumerableTFromAny[int](enumerable)
+```
+#### AsEnumerableTFromSliceAny
+AsEnumerableTFromSliceAny creates a new Enumerable of specific type from slice of any type
+
+Example:
+```go
+enumerableInt := lingo.AsEnumerableTFromSliceAny[int]([]any{1, 2, 3})
+```
+#### Empty
+Empty returns an empty Enumerable[T] that has the specified type argument.
+
+Example:
+```go
+emptyInt := lingo.Empty[int]()
+```
+#### Range
+Range generates a sequence of integral numbers within a specified range.
+
+Example: create an enumerable of int from 1 to 10
+```go
+rangeInt := lingo.Range(1, 10)
+```
+#### Repeat
+Repeat generates a sequence that contains one repeated value.
+
+Example: create a enumerable of int, it contains 10 elements 1
+```go
+repeatInt := lingo.Repeat(1, 10)
+```
+#### Concat
+Concat concatenates two sequences.
+
+Example:
+```go
+first := lingo.Range(1, 10)
+second := lingo.Range(11, 20)
+first.Concat(second) // 1-20
+```
+
+### Retrieve data
+#### FirstOrNil
+FirstOrNil returns the first element of a sequence (with condition if any), or a nil value if no element is found
+
+Example:
+```go
+enumerable := lingo.Range(1, 10)
+first := enumerable.FirstOrNil(nil) // 1
+```
+#### FirstOrDefault
+FirstOrDefault returns the first element of a sequence (with condition if any), or a default value if no element is found
+
+Example:
+```go
+enumerable := lingo.Empty[int]()
+first := enumerable.FirstOrDefault(-999, nil) // -999
+```
+#### LastOrNil
+LastOrNil returns the last element of a sequence (with condition if any), or a nil value if no element is found
+
+Example:
+```go
+enumerable := lingo.Empty[int]()
+last := enumerable.LastOrNil(nil) // 0
+```
+#### LastOrDefault
+LastOrDefault returns the last element of a sequence (with condition if any), or a default value if no element is found
+
+Example:
+```go
+enumerable := lingo.Empty[int]()
+last := enumerable.LastOrDefault(999, nil) // 999
+```
+#### ElementAtOrNil
+ElementAtOrNil returns the element at a specified index in a sequence or a default value if the index is out of range.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100)
+element := enumerable.ElementAtOrNil(54) // 55
+```
+#### ElementAtOrDefault
+ElementAtOrDefault returns the element at a specified index in a sequence or a default value if the index is out of range.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100)
+element := enumerable.ElementAtOrDefault(100, -1) // -1
+```
+
 
 ### Filtering data
 
@@ -223,6 +331,51 @@ enumerable := lingo.AsEnumerable(source).Zip(classIds, nil)
 fmt.Println(enumerable.ToSlice())
 // Result: [[{1 Anh} 11] [{2 An} 22] [{3 A} 33]]
 ```
+
+### Aggregation operations
+#### Min
+Min returns the minimum value in a sequence of values. In this method, comparer is returns whether left is smaller than right or not, if comparer is nill, we will use the default comparer.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100)
+m := enumerable.Min(nil) // 1
+```
+#### Max
+Max returns the minimum value in a sequence of values.
+In this method, comparer is returns whether left is greater than right or not, if comparer is nill, we will use the default comparer.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100)
+m := enumerable.Max(nil) // 100
+```
+#### Sum
+Sum computes the sum of a sequence of numeric values.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100)
+sum := enumerable.Sum(nil) // 5050
+```
+#### Average
+Average computes the average of a sequence of numeric values.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100)
+sum := enumerable.Average(nil) // 50.5
+```
+#### Count
+Count returns the number of elements in a sequence.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100)
+count := enumerable.Count() // 100
+```
+
+
 ### Set operations
 #### Distinct
 Distinct removes duplicate values from a collection.
