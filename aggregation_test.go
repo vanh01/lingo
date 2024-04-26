@@ -313,3 +313,43 @@ func TestCount(t *testing.T) {
 		})
 	}
 }
+
+func TestAggregate(t *testing.T) {
+	type args struct {
+		source     []int
+		seed       int
+		accmulator lingo.Accumulator[any, int]
+		selector   lingo.SingleSelector[any]
+		want       int
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Aggregate",
+			args: args{
+				source: []int{1, 2, 3, 4, 5},
+				seed:   0,
+				accmulator: func(a1 any, a2 int) any {
+					if a2%2 == 0 {
+						return a1.(int) + 1
+					}
+					return a1
+				},
+				selector: func(a any) any {
+					return a.(int) * a.(int)
+				},
+				want: 4,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.args.source).Aggregate(tt.args.seed, tt.args.accmulator, tt.args.selector)
+			if got != tt.args.want {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.args.want)
+			}
+		})
+	}
+}

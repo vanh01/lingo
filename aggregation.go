@@ -125,3 +125,25 @@ func (e Enumerable[T]) Count() int64 {
 	}
 	return i
 }
+
+// Aggregate applies an accumulator function over a sequence.
+// The specified seed value is used as the initial accumulator value,
+// and the specified function is used to select the result value.
+//
+// resultSelector can be nil
+//
+// # Noted that the type of seed, the left type of Accumulator function and the input type of selector must be the same
+func (e Enumerable[T]) Aggregate(
+	seed any,
+	accumulator Accumulator[any, T],
+	resultSelector SingleSelector[any],
+) any {
+	var res any = seed
+	for value := range e.iterator {
+		res = accumulator(res, value)
+	}
+	if resultSelector != nil {
+		return resultSelector(res)
+	}
+	return res
+}
