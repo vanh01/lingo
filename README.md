@@ -1,6 +1,8 @@
 # lingo
 
+[![go report card](https://goreportcard.com/badge/github.com/vanh01/lingo "go report card")](https://goreportcard.com/report/github.com/vanh01/lingo)
 [![test status](https://github.com/vanh01/lingo/actions/workflows/test.yml/badge.svg "test status")](https://github.com/vanh01/lingo/actions)
+[![Go Reference](https://pkg.go.dev/badge/github.com/vanh01/lingo.svg)](https://pkg.go.dev/github.com/vanh01/lingo)
 
 lingo is a library written in Go. It is LinQ in .NET for Go. It will help the array processing code more neat.
 
