@@ -229,7 +229,7 @@ func TestElementAtOrDefault(t *testing.T) {
 		want   int
 	}{
 		{
-			name:   "LastOrDefault",
+			name:   "ElementAtOrDefault",
 			source: []int{1, 2, 3},
 			args: args{
 				defaultValue: -99,
@@ -238,7 +238,7 @@ func TestElementAtOrDefault(t *testing.T) {
 			want: 1,
 		},
 		{
-			name:   "LastOrDefault",
+			name:   "ElementAtOrDefault",
 			source: []int{1, 2, 3},
 			args: args{
 				defaultValue: -999,
@@ -247,7 +247,7 @@ func TestElementAtOrDefault(t *testing.T) {
 			want: 3,
 		},
 		{
-			name:   "LastOrDefault",
+			name:   "ElementAtOrDefault",
 			source: []int{1, 2, 3},
 			args: args{
 				defaultValue: -9,

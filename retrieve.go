@@ -86,7 +86,7 @@ func (e Enumerable[T]) ElementAtOrNil(index int64) T {
 			i++
 		}
 	}
-	if i < index {
+	if i != index+1 {
 		var tt T
 		return tt
 	}
@@ -103,7 +103,7 @@ func (e Enumerable[T]) ElementAtOrDefault(index int64, defaultValue T) T {
 			i++
 		}
 	}
-	if i < index {
+	if i != index+1 {
 		return defaultValue
 	}
 	return t
