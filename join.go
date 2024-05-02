@@ -10,27 +10,29 @@ func (e Enumerable[T]) Join(
 	resultSelector CombinationSelector[T, any],
 	comparer Comparer[any],
 ) Enumerable[any] {
-	out := make(chan any)
-
-	go func() {
-		defer close(out)
-		innerSlice := inner.ToSlice()
-		for value := range e.iterator {
-			for _, i := range innerSlice {
-				outerKey := outerKeySelector(value)
-				innerKey := innerKeySelector(i)
-				if comparer == nil {
-					if outerKey == innerKey {
-						out <- resultSelector(value, i)
-					}
-				} else if comparer(outerKey, innerKey) {
-					out <- resultSelector(value, i)
-				}
-			}
-		}
-	}()
-
 	return Enumerable[any]{
-		iterator: out,
+		getIter: func() <-chan any {
+			out := make(chan any)
+
+			go func() {
+				defer close(out)
+				innerSlice := inner.ToSlice()
+				for value := range e.getIter() {
+					for _, i := range innerSlice {
+						outerKey := outerKeySelector(value)
+						innerKey := innerKeySelector(i)
+						if comparer == nil {
+							if outerKey == innerKey {
+								out <- resultSelector(value, i)
+							}
+						} else if comparer(outerKey, innerKey) {
+							out <- resultSelector(value, i)
+						}
+					}
+				}
+			}()
+
+			return out
+		},
 	}
 }

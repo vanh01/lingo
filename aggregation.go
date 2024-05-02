@@ -10,7 +10,7 @@ import "reflect"
 func (e Enumerable[T]) Min(comparer Comparer[T]) T {
 	var t T
 	first := true
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		if first {
 			t = value
 			first = false
@@ -34,7 +34,7 @@ func (e Enumerable[T]) Min(comparer Comparer[T]) T {
 func (e Enumerable[T]) Max(comparer Comparer[T]) T {
 	var t T
 	first := true
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		if first {
 			t = value
 			first = false
@@ -56,7 +56,7 @@ func (e Enumerable[T]) Sum(selector SingleSelector[T]) any {
 	var sumUint64 uint64 = 0
 	var sumFloat64 float64 = 0
 	var temp any
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		temp = value
 		if selector != nil {
 			temp = selector(value)
@@ -89,7 +89,7 @@ func (e Enumerable[T]) Average(selector SingleSelector[T]) float64 {
 	var sumFloat64 float64 = 0
 	var temp any
 	i := 0
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		temp = value
 		if selector != nil {
 			temp = selector(value)
@@ -119,7 +119,7 @@ func (e Enumerable[T]) Average(selector SingleSelector[T]) float64 {
 // Count returns the number of elements in a sequence.
 func (e Enumerable[T]) Count() int64 {
 	var i int64 = 0
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		_ = value
 		i++
 	}
@@ -139,7 +139,7 @@ func (e Enumerable[T]) Aggregate(
 	resultSelector SingleSelector[any],
 ) any {
 	var res any = seed
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		res = accumulator(res, value)
 	}
 	if resultSelector != nil {

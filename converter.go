@@ -8,7 +8,7 @@ import (
 // ToSlice converts the iterator into a slice
 func (e Enumerable[T]) ToSlice() []T {
 	res := []T{}
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		res = append(res, value)
 	}
 	return res
@@ -17,7 +17,7 @@ func (e Enumerable[T]) ToSlice() []T {
 // ToMap converts the iterator into a map with specific selector
 func (e Enumerable[T]) ToMap(keySelector SingleSelector[T], elementSelector SingleSelector[T]) map[any]any {
 	res := map[any]any{}
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		res[keySelector(value)] = elementSelector(value)
 	}
 	return res

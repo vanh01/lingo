@@ -7,7 +7,7 @@ package lingo
 func (e Enumerable[T]) FirstOrNil(predicate Predicate[T]) T {
 	var t T
 	first := true
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		if predicate != nil {
 			if !predicate(value) {
 				continue
@@ -28,7 +28,7 @@ func (e Enumerable[T]) FirstOrNil(predicate Predicate[T]) T {
 func (e Enumerable[T]) FirstOrDefault(defaultValue T, predicate Predicate[T]) T {
 	var t T = defaultValue
 	first := true
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		if predicate != nil {
 			if !predicate(value) {
 				continue
@@ -48,7 +48,7 @@ func (e Enumerable[T]) FirstOrDefault(defaultValue T, predicate Predicate[T]) T 
 // the predicate can be nil
 func (e Enumerable[T]) LastOrNil(predicate Predicate[T]) T {
 	var t T
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		if predicate != nil {
 			if !predicate(value) {
 				continue
@@ -65,7 +65,7 @@ func (e Enumerable[T]) LastOrNil(predicate Predicate[T]) T {
 // the predicate can be nil
 func (e Enumerable[T]) LastOrDefault(defaultValue T, predicate Predicate[T]) T {
 	var t T = defaultValue
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		if predicate != nil {
 			if !predicate(value) {
 				continue
@@ -80,7 +80,7 @@ func (e Enumerable[T]) LastOrDefault(defaultValue T, predicate Predicate[T]) T {
 func (e Enumerable[T]) ElementAtOrNil(index int64) T {
 	var t T
 	var i int64 = 0
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		if i <= index {
 			t = value
 			i++
@@ -97,7 +97,7 @@ func (e Enumerable[T]) ElementAtOrNil(index int64) T {
 func (e Enumerable[T]) ElementAtOrDefault(index int64, defaultValue T) T {
 	var t T = defaultValue
 	var i int64 = 0
-	for value := range e.iterator {
+	for value := range e.getIter() {
 		if i <= index {
 			t = value
 			i++
