@@ -8,6 +8,7 @@ lingo is a library written in Go. It is LinQ in .NET for Go. It will help the ar
 
 **The key features of lingo are:**
 - [Initialize enumerable](#initialize-enumerable)
+- [Modification enumerable](#modification-enumerable)
 - [Retrieve data](#retrieve-data)
 - [Filtering data](#filtering-data)
 - [Projection operations](#projection-operations)
@@ -144,6 +145,15 @@ The following table classifies each supported method, there are two types: Immed
 |[OrderBy](#orderby)|Enumerable[T]||x|
 |[OrderByDescending](#orderbydescending)|Enumerable[T]||x|
 |[Reverse](#reverse)|Enumerable[T]||x|
+|[Append](#append)|Enumerable[T]||x|
+|[AppendRange](#appendrange)|Enumerable[T]||x|
+|[Prepend](#prepend)|Enumerable[T]||x|
+|[PrependRange](#prependrange)|Enumerable[T]||x|
+|[Clear](#clear)|Enumerable[T]||x|
+|[Insert](#insert)|Enumerable[T]||x|
+|[Remove](#remove)|Enumerable[T]||x|
+|[RemoveAt](#removeat)|Enumerable[T]||x|
+|[RemoveRange](#removerange)|Enumerable[T]||x|
 
 
 
@@ -217,6 +227,88 @@ Example:
 first := lingo.Range(1, 10)
 second := lingo.Range(11, 20)
 first.Concat(second) // 1-20
+```
+
+### Modification enumerable
+#### Append
+Append appends a value to the end of the sequence.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.Append(99).ToSlice() // 1-10, 99
+```
+
+#### AppendRange
+AppendRange appends the elements of the specified collection to the end of the sequence.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.AppendRange(lingo.Range(100, 110)).ToSlice() // 1-10, 100-110
+```
+
+#### Prepend
+Prepend adds a value to the beginning of the sequence.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.Prepend(99).ToSlice() // 99, 1-10
+```
+
+#### PrependRange
+PrependRange appends the elements of the specified collection to the beginning of the sequence.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.PrependRange(lingo.Range(100, 110)).ToSlice() // 100-110, 1-10
+```
+
+#### Clear
+Clear removes all elements of the sequence.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.Clear().ToSlice() // []
+```
+
+#### Insert
+Insert inserts an element into the sequence at the specified index.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.Insert(3, 999).ToSlice() // 1-999, 4-10
+```
+
+#### Remove
+Remove removes the first occurrence of the given element, if found.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.Remove(9, nil).ToSlice() // 1-8, 10
+```
+
+#### RemoveAt
+RemoveAt removes the element at the specified index of the sequence.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.RemoveAt(6).ToSlice() // 1-6, 8-10
+```
+
+#### RemoveRange
+RemoveRange removes a range of elements from the sequence.
+
+Example:
+```go
+enum := lingo.Range(1, 10)
+enum.RemoveRange(3, 3).ToSlice() // 1-3, 7-10
 ```
 
 ### Retrieve data
