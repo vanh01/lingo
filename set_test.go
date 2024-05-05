@@ -171,8 +171,6 @@ func TestExcept(t *testing.T) {
 			}},
 			want: []Student{
 				{Id: 1, Name: "Nam", Level: 1},
-				{Id: 2, Name: "An", Level: 2},
-				{Id: 3, Name: "Anh", Level: 2},
 			},
 		},
 		{
@@ -192,8 +190,6 @@ func TestExcept(t *testing.T) {
 			want: []Student{
 				{Id: 1, Name: "Nam", Level: 1},
 				{Id: 2, Name: "An", Level: 2},
-				{Id: 2, Name: "An", Level: 2},
-				{Id: 3, Name: "Anh", Level: 2},
 			},
 		},
 	}
@@ -206,6 +202,90 @@ func TestExcept(t *testing.T) {
 			for i := range tt.want {
 				if got[i] != tt.want[i] {
 					t.Errorf("Except() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestExceptBy(t *testing.T) {
+	type Student struct {
+		Id    int
+		Name  string
+		Level int
+	}
+	type args struct {
+		second      []Student
+		keySelector lingo.SingleSelector[Student]
+		comparer    lingo.Comparer[any]
+	}
+	tests := []struct {
+		name   string
+		source []Student
+		args   args
+		want   []Student
+	}{
+		{
+			name: "ExceptBy",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 3, Name: "Anh1", Level: 2},
+				{Id: 3, Name: "Anh3", Level: 2},
+			},
+			args: args{
+				second: []Student{
+					{Id: 2, Name: "An", Level: 2},
+					{Id: 3, Name: "Anh", Level: 2},
+				},
+				keySelector: func(s Student) any {
+					return s.Name
+				},
+				comparer: func(a1, a2 any) bool {
+					return len(a1.(string)) == len(a2.(string))
+				},
+			},
+			want: []Student{
+				{Id: 3, Name: "Anh1", Level: 2},
+			},
+		},
+		{
+			name: "ExceptBy",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 1, Name: "Nam", Level: 1},
+			},
+			args: args{
+				second: []Student{
+					{Id: 2, Name: "An", Level: 2},
+					{Id: 2, Name: "An", Level: 2},
+					{Id: 3, Name: "Anh", Level: 2},
+				},
+				keySelector: func(s Student) any {
+					return s
+				},
+			},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.source).ExceptBy(lingo.AsEnumerable(tt.args.second), tt.args.keySelector, tt.args.comparer).ToSlice()
+			if len(got) != len(tt.want) {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+			}
+			for i := range tt.want {
+				if got[i] != tt.want[i] {
+					t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
 				}
 			}
 		})
@@ -246,7 +326,6 @@ func TestIntersect(t *testing.T) {
 			want: []Student{
 				{Id: 2, Name: "An", Level: 2},
 				{Id: 3, Name: "Anh", Level: 2},
-				{Id: 3, Name: "Anh", Level: 2},
 			},
 		},
 		{
@@ -259,6 +338,7 @@ func TestIntersect(t *testing.T) {
 				{Id: 3, Name: "Anh", Level: 2},
 			},
 			args: args{second: []Student{
+				{Id: 3, Name: "Anh", Level: 2},
 				{Id: 3, Name: "Anh", Level: 2},
 			}},
 			want: []Student{
@@ -275,6 +355,98 @@ func TestIntersect(t *testing.T) {
 			for i := range tt.want {
 				if got[i] != tt.want[i] {
 					t.Errorf("Intersect() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestIntersectBy(t *testing.T) {
+	type Student struct {
+		Id    int
+		Name  string
+		Level int
+	}
+	type args struct {
+		second      []Student
+		keySelector lingo.SingleSelector[Student]
+		comparer    lingo.Comparer[any]
+	}
+	tests := []struct {
+		name   string
+		source []Student
+		args   args
+		want   []Student
+	}{
+		{
+			name: "IntersectBy",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{
+				second: []Student{
+					{Id: 2, Name: "An", Level: 2},
+					{Id: 3, Name: "Anh", Level: 2},
+					{Id: 3, Name: "Anh", Level: 2},
+					{Id: 4, Name: "An", Level: 2},
+					{Id: 5, Name: "Anh", Level: 2},
+				},
+				keySelector: func(s Student) any {
+					return s.Name
+				},
+				comparer: func(a1, a2 any) bool {
+					return len(a1.(string)) == len(a2.(string))
+				},
+			},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+			},
+		},
+		{
+			name: "IntersectBy",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{
+				second: []Student{
+					{Id: 2, Name: "An", Level: 2},
+					{Id: 3, Name: "Anh", Level: 2},
+					{Id: 3, Name: "Anh", Level: 2},
+					{Id: 4, Name: "An", Level: 2},
+					{Id: 5, Name: "Anh", Level: 2},
+				},
+				keySelector: func(s Student) any {
+					return s.Name
+				},
+			},
+			want: []Student{
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.source).IntersectBy(
+				lingo.AsEnumerable(tt.args.second),
+				tt.args.keySelector,
+				tt.args.comparer,
+			).ToSlice()
+			if len(got) != len(tt.want) {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+			}
+			for i := range tt.want {
+				if got[i] != tt.want[i] {
+					t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
 				}
 			}
 		})
@@ -315,8 +487,6 @@ func TestUnion(t *testing.T) {
 				{Id: 1, Name: "Nam", Level: 1},
 				{Id: 2, Name: "An", Level: 2},
 				{Id: 3, Name: "Anh", Level: 2},
-				{Id: 2, Name: "An", Level: 2},
-				{Id: 3, Name: "Anh", Level: 2},
 				{Id: 4, Name: "An", Level: 2},
 				{Id: 5, Name: "Anh", Level: 2},
 			},
@@ -338,8 +508,6 @@ func TestUnion(t *testing.T) {
 				{Id: 1, Name: "Nam", Level: 1},
 				{Id: 2, Name: "An", Level: 2},
 				{Id: 3, Name: "Anh", Level: 2},
-				{Id: 2, Name: "An", Level: 2},
-				{Id: 3, Name: "Anh", Level: 2},
 			},
 		},
 	}
@@ -352,6 +520,101 @@ func TestUnion(t *testing.T) {
 			for i := range tt.want {
 				if got[i] != tt.want[i] {
 					t.Errorf("Union() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestUnionBy(t *testing.T) {
+	type Student struct {
+		Id    int
+		Name  string
+		Level int
+	}
+	type args struct {
+		second      []Student
+		keySelector lingo.SingleSelector[Student]
+		comparer    lingo.Comparer[any]
+	}
+	tests := []struct {
+		name   string
+		source []Student
+		args   args
+		want   []Student
+	}{
+		{
+			name: "UnionBy",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{
+				second: []Student{
+					{Id: 2, Name: "An", Level: 2},
+					{Id: 3, Name: "Anh", Level: 2},
+					{Id: 4, Name: "An", Level: 2},
+					{Id: 5, Name: "Anh", Level: 2},
+					{Id: 5, Name: "1", Level: 2},
+				},
+				keySelector: func(s Student) any {
+					return s.Name
+				},
+				comparer: func(a1, a2 any) bool {
+					return len(a1.(string)) == len(a2.(string))
+				},
+			},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 5, Name: "1", Level: 2},
+			},
+		},
+		{
+			name: "UnionBy",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{
+				second: []Student{
+					{Id: 2, Name: "An", Level: 2},
+					{Id: 3, Name: "Anh", Level: 2},
+					{Id: 4, Name: "An", Level: 2},
+					{Id: 5, Name: "Anh", Level: 2},
+					{Id: 5, Name: "AnhHoa", Level: 2},
+				},
+				keySelector: func(s Student) any {
+					return s.Name
+				},
+			},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 5, Name: "AnhHoa", Level: 2},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.source).UnionBy(
+				lingo.AsEnumerable(tt.args.second),
+				tt.args.keySelector,
+				tt.args.comparer,
+			).ToSlice()
+			if len(got) != len(tt.want) {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+			}
+			for i := range tt.want {
+				if got[i] != tt.want[i] {
+					t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
 				}
 			}
 		})

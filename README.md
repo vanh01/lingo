@@ -140,8 +140,11 @@ The following table classifies each supported method, there are two types: Immed
 |[Distinct](#distinct)|Enumerable[T]||x|
 |[DistinctBy](#distinctby)|Enumerable[T]||x|
 |[Except](#except)|Enumerable[T]||x|
+|[ExceptBy](#exceptby)|Enumerable[T]||x|
 |[Intersect](#intersect)|Enumerable[T]||x|
+|[IntersectBy](#intersectby)|Enumerable[T]||x|
 |[Union](#union)|Enumerable[T]||x|
+|[UnionBy](#unionby)|Enumerable[T]||x|
 |[OrderBy](#orderby)|Enumerable[T]||x|
 |[OrderByDescending](#orderbydescending)|Enumerable[T]||x|
 |[Reverse](#reverse)|Enumerable[T]||x|
@@ -601,8 +604,35 @@ second := []Student{
 
 enumerable := lingo.AsEnumerable(source).Except(lingo.AsEnumerable(second))
 fmt.Println(enumerable.ToSlice())
-// Result: [{3 A} {1 AKh} {2 Lah} {3 A}]
+// Result: [{3 A} {1 AKh} {2 Lah}]
 ```
+
+#### ExceptBy
+ExceptBy returns the set difference, which means the elements of one collection that don't appear in a second collection according to a specified key selector function.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+}
+
+second := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+}
+
+enumerable := lingo.AsEnumerable(source).ExceptBy(lingo.AsEnumerable(second), func(s Student) any {
+	return s.Name
+}, nil)
+fmt.Println(enumerable.ToSlice())
+// Result: [{3 A}]
+```
+
 #### Intersect
 Intersect returns the set intersection, which means elements that appear in each of two collections.
 
@@ -631,6 +661,32 @@ fmt.Println(enumerable.ToSlice())
 // Result: [{1 Anh} {2 hnA}]
 ```
 
+#### IntersectBy
+Intersect returns the set intersection, which means elements that appear in each of two collections according to a specified key selector function.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+}
+
+second := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+}
+
+enumerable := lingo.AsEnumerable(source).IntersectBy(lingo.AsEnumerable(second), func(s Student) any {
+	return s.Name
+}, nil)
+fmt.Println(enumerable.ToSlice())
+// Result: [{1 Anh} {2 hnA}]
+```
+
 #### Union
 Union returns the set union, which means unique elements that appear in either of two collections.
 
@@ -651,6 +707,32 @@ second := []Student{
 enumerable := lingo.AsEnumerable(source).Union(lingo.AsEnumerable(second))
 fmt.Println(enumerable.ToSlice())
 // Result: [{1 Anh} {2 hnA} {3 A} {3 Ab}]
+```
+
+#### UnionBy
+Union returns the set union, which means unique elements that appear in either of two collections according to a specified key selector function.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+}
+
+second := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+}
+
+enumerable := lingo.AsEnumerable(source).UnionBy(lingo.AsEnumerable(second), func(s Student) any {
+	return s.Name
+}, nil)
+fmt.Println(enumerable.ToSlice())
+// Result: [{1 Anh} {2 hnA} {3 A}]
 ```
 
 ### Sorting data
