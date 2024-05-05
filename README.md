@@ -848,6 +848,17 @@ fmt.Println(enumerable.ToSlice())
 // Result: [{1 Anh} {2 hnA}]
 ```
 
+#### Chunk
+Chunk splits the elements of a sequence into chunks of a specified maximum size.
+
+Example:
+```go
+lingo.Chunk(lingo.Range(1, 11), 5).ToSlice()
+// 1-5
+// 6-10
+// 11
+```
+
 ### Converting data types
 #### ToSlice
 ToSlice converts the iterator into a slice

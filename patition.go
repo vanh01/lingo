@@ -89,3 +89,30 @@ func (e Enumerable[T]) TakeWhile(predicate Predicate[T]) Enumerable[T] {
 		},
 	}
 }
+
+// Chunk splits the elements of a sequence into chunks of a specified maximum size.
+func Chunk[T any](e Enumerable[T], size int) Enumerable[[]T] {
+	return Enumerable[[]T]{
+		getIter: func() <-chan []T {
+			out := make(chan []T)
+
+			go func() {
+				defer close(out)
+				chunk := []T{}
+				i := 0
+				for value := range e.getIter() {
+					if i == size {
+						out <- chunk
+						chunk = []T{}
+						i = 0
+					}
+					chunk = append(chunk, value)
+					i++
+				}
+				out <- chunk
+			}()
+
+			return out
+		},
+	}
+}
