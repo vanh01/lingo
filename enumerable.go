@@ -9,6 +9,11 @@ type Enumerable[T any] struct {
 	getIter func() <-chan T
 }
 
+// GetIter returns an unbuffered channel of T that iterates through a collection.
+func (e Enumerable[T]) GetIter() <-chan T {
+	return e.getIter()
+}
+
 // AsEnumerable creates a new Enumerable
 func AsEnumerable[T any](t []T) Enumerable[T] {
 	return Enumerable[T]{

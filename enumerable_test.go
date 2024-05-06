@@ -169,3 +169,31 @@ func TestRepeat(t *testing.T) {
 		})
 	}
 }
+
+func TestGetIter(t *testing.T) {
+	type args struct {
+	}
+	tests := []struct {
+		name   string
+		source []int
+		args   args
+		want   []int
+	}{
+		{
+			name:   "GetIter",
+			source: []int{1, 2, 3, 4, 5, 6},
+			want:   []int{1, 2, 3, 4, 5, 6},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := 0
+			for value := range lingo.AsEnumerable(tt.source).GetIter() {
+				if value != tt.want[i] {
+					t.Errorf("%s() = %v, want %v", tt.name, value, tt.want[i])
+				}
+				i++
+			}
+		})
+	}
+}
