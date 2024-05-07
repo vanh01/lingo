@@ -24,7 +24,7 @@ type GetHashCode[T any] func(T) any
 type Accumulator[T any, K any] func(T, K) T
 
 func isInt(i any) bool {
-	switch reflect.TypeOf(i).Kind() {
+	switch reflect.ValueOf(i).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return true
 	}
@@ -32,7 +32,7 @@ func isInt(i any) bool {
 }
 
 func isUint(i any) bool {
-	switch reflect.TypeOf(i).Kind() {
+	switch reflect.ValueOf(i).Kind() {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return true
 	}
@@ -40,7 +40,7 @@ func isUint(i any) bool {
 }
 
 func isFloat(i any) bool {
-	switch reflect.TypeOf(i).Kind() {
+	switch reflect.ValueOf(i).Kind() {
 	case reflect.Float32, reflect.Float64:
 		return true
 	}
@@ -55,7 +55,7 @@ func isNumber(i any) bool {
 func floatToActualInt[T any](value any) T {
 	var t T
 	valueFloat64 := reflect.ValueOf(value).Float()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Int:
 		t = reflect.ValueOf(int(valueFloat64)).Interface().(T)
 	case reflect.Int8:
@@ -72,7 +72,7 @@ func floatToActualInt[T any](value any) T {
 func uintToActualInt[T any](value any) T {
 	var t T
 	valueUint64 := reflect.ValueOf(value).Uint()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Int:
 		t = reflect.ValueOf(int(valueUint64)).Interface().(T)
 	case reflect.Int8:
@@ -89,7 +89,7 @@ func uintToActualInt[T any](value any) T {
 func intToActualInt[T any](value any) T {
 	var t T
 	valueInt64 := reflect.ValueOf(value).Int()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Int:
 		t = reflect.ValueOf(int(valueInt64)).Interface().(T)
 	case reflect.Int8:
@@ -108,7 +108,7 @@ func intToActualInt[T any](value any) T {
 func floatToActualUint[T any](value any) T {
 	var t T
 	valueFloat64 := reflect.ValueOf(value).Float()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Uint:
 		t = reflect.ValueOf(uint(valueFloat64)).Interface().(T)
 	case reflect.Uint8:
@@ -125,7 +125,7 @@ func floatToActualUint[T any](value any) T {
 func uintToActualUint[T any](value any) T {
 	var t T
 	valueUint64 := reflect.ValueOf(value).Uint()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Uint:
 		t = reflect.ValueOf(uint(valueUint64)).Interface().(T)
 	case reflect.Uint8:
@@ -142,7 +142,7 @@ func uintToActualUint[T any](value any) T {
 func intToActualUint[T any](value any) T {
 	var t T
 	valueInt64 := reflect.ValueOf(value).Int()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Uint:
 		t = reflect.ValueOf(uint(valueInt64)).Interface().(T)
 	case reflect.Uint8:
@@ -161,7 +161,7 @@ func intToActualUint[T any](value any) T {
 func intToActualFloat[T any](value any) T {
 	var t T
 	valueInt64 := reflect.ValueOf(value).Int()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Float32:
 		t = reflect.ValueOf(float32(valueInt64)).Interface().(T)
 	case reflect.Float64:
@@ -172,7 +172,7 @@ func intToActualFloat[T any](value any) T {
 func uintToActualFloat[T any](value any) T {
 	var t T
 	valueInt64 := reflect.ValueOf(value).Uint()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Float32:
 		t = reflect.ValueOf(float32(valueInt64)).Interface().(T)
 	case reflect.Float64:
@@ -183,7 +183,7 @@ func uintToActualFloat[T any](value any) T {
 func floatToActualFloat[T any](value any) T {
 	var t T
 	valueFloat64 := reflect.ValueOf(value).Float()
-	switch reflect.TypeOf(t).Kind() {
+	switch reflect.ValueOf(t).Kind() {
 	case reflect.Float32:
 		t = reflect.ValueOf(float32(valueFloat64)).Interface().(T)
 	case reflect.Float64:
@@ -253,7 +253,7 @@ func defaultConvertToNumber[T any](value any) T {
 
 // defaultLessComparer is the default compare when the first one is smaller than the second one
 func defaultLessComparer[T any](t1, t2 T) bool {
-	switch reflect.TypeOf(t1).Kind() {
+	switch reflect.ValueOf(t1).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return reflect.ValueOf(t1).Int() < reflect.ValueOf(t2).Int()
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -275,7 +275,7 @@ func defaultLessComparer[T any](t1, t2 T) bool {
 
 // defaultMoreComparer is the default compare when the first one is greater than the second one
 func defaultMoreComparer[T any](t1, t2 T) bool {
-	switch reflect.TypeOf(t1).Kind() {
+	switch reflect.ValueOf(t1).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return reflect.ValueOf(t1).Int() > reflect.ValueOf(t2).Int()
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
