@@ -60,6 +60,24 @@ func AsEnumerableTFromAny[T any](e Enumerable[any]) Enumerable[T] {
 	}
 }
 
+// AsEnumerableAnyFromT creates a new Enumerable of any type from Enumerable of specific type
+func AsEnumerableAnyFromT[T any](e Enumerable[T]) Enumerable[any] {
+	return Enumerable[any]{
+		getIter: func() <-chan any {
+			out := make(chan any)
+
+			go func() {
+				defer close(out)
+				for value := range e.getIter() {
+					out <- value
+				}
+			}()
+
+			return out
+		},
+	}
+}
+
 // AsEnumerableTFromSliceAny creates a new Enumerable of specific type from slice of any
 //
 // This will be useful after using projection operations
@@ -81,6 +99,24 @@ func AsEnumerableTFromSliceAny[T any](a []any) Enumerable[T] {
 					default:
 						out <- *(*T)(unsafe.Pointer(&value))
 					}
+				}
+			}()
+
+			return out
+		},
+	}
+}
+
+// AsEnumerableAnyFromSliceT creates a new Enumerable of any type from slice of specific type
+func AsEnumerableAnyFromSliceT[T any](a []T) Enumerable[any] {
+	return Enumerable[any]{
+		getIter: func() <-chan any {
+			out := make(chan any)
+
+			go func() {
+				defer close(out)
+				for _, value := range a {
+					out <- value
 				}
 			}()
 

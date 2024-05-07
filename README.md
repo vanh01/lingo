@@ -194,12 +194,27 @@ Example:
 enumerable := lingo.AsEnumerable([]any{1, 2, 3})
 enumerableInt := lingo.AsEnumerableTFromAny[int](enumerable)
 ```
+#### AsEnumerableAnyFromT
+AsEnumerableAnyFromT creates a new Enumerable of any type from Enumerable of specific type.
+
+Example:
+```go
+enumerableInt := lingo.AsEnumerable([]int{1, 2, 3})
+enumerableAny := lingo.AsEnumerableAnyFromT(enumerableInt)
+```
 #### AsEnumerableTFromSliceAny
 AsEnumerableTFromSliceAny creates a new Enumerable of specific type from slice of any type
 
 Example:
 ```go
 enumerableInt := lingo.AsEnumerableTFromSliceAny[int]([]any{1, 2, 3})
+```
+#### AsEnumerableAnyFromSliceT
+AsEnumerableAnyFromSliceT creates a new Enumerable of any type from slice of specific type
+
+Example:
+```go
+enumerableAny := lingo.AsEnumerableAnyFromSliceT([]int{1, 2, 3})
 ```
 #### Empty
 Empty returns an empty Enumerable[T] that has the specified type argument.
