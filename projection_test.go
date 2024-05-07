@@ -120,7 +120,7 @@ func TestZip(t *testing.T) {
 		Name string
 	}
 	type args struct {
-		first          lingo.TFirst
+		first          lingo.Enumerable[any]
 		resultSelector lingo.CombinationSelector[Student, any]
 	}
 	tests := []struct {
@@ -136,7 +136,7 @@ func TestZip(t *testing.T) {
 				{Id: 2, Name: "An", Level: 2},
 				{Id: 3, Name: "Anh", Level: 2},
 			},
-			args: args{first: []int{8, 9, 10}},
+			args: args{first: lingo.AsEnumerable([]any{8, 9, 10})},
 			want: []any{
 				[]any{Student{Id: 1, Name: "Nam", Level: 1}, 8},
 				[]any{Student{Id: 2, Name: "An", Level: 2}, 9},
@@ -151,40 +151,7 @@ func TestZip(t *testing.T) {
 				{Id: 3, Name: "Anh", Level: 2},
 			},
 			args: args{
-				first: []int{8, 9, 10},
-				resultSelector: func(s Student, k any) any {
-					return []any{s, k.(int) - 1}
-				},
-			},
-			want: []any{
-				[]any{Student{Id: 1, Name: "Nam", Level: 1}, 7},
-				[]any{Student{Id: 2, Name: "An", Level: 2}, 8},
-				[]any{Student{Id: 3, Name: "Anh", Level: 2}, 9},
-			},
-		},
-		{
-			name: "Zip",
-			source: []Student{
-				{Id: 1, Name: "Nam", Level: 1},
-				{Id: 2, Name: "An", Level: 2},
-				{Id: 3, Name: "Anh", Level: 2},
-			},
-			args: args{first: lingo.AsEnumerable([]int{8, 9, 10})},
-			want: []any{
-				[]any{Student{Id: 1, Name: "Nam", Level: 1}, 8},
-				[]any{Student{Id: 2, Name: "An", Level: 2}, 9},
-				[]any{Student{Id: 3, Name: "Anh", Level: 2}, 10},
-			},
-		},
-		{
-			name: "Zip",
-			source: []Student{
-				{Id: 1, Name: "Nam", Level: 1},
-				{Id: 2, Name: "An", Level: 2},
-				{Id: 3, Name: "Anh", Level: 2},
-			},
-			args: args{
-				first: lingo.AsEnumerable([]int{8, 9, 10}),
+				first: lingo.AsEnumerable([]any{8, 9, 10}),
 				resultSelector: func(s Student, k any) any {
 					return []any{s, k.(int) - 1}
 				},

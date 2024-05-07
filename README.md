@@ -446,9 +446,9 @@ source := []Student{
 	{Id: 2, Name: "An"},
 	{Id: 3, Name: "A"},
 }
-classIds := []int{11, 22, 33}
+classIds := []any{11, 22, 33}
 
-enumerable := lingo.AsEnumerable(source).Zip(classIds, func(s Student, a any) any {
+enumerable := lingo.AsEnumerable(source).Zip(lingo.AsEnumerable(classIds), func(s Student, a any) any {
 	return struct {
 		Id      int
 		Name    string

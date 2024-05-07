@@ -46,41 +46,24 @@ func (e Enumerable[T]) SelectMany(selector SingleSelector[T]) Enumerable[any] {
 	}
 }
 
-type TFirst interface {
-	Enumerable[any] | any
-}
-
 // Zip produces a sequence of tuples with elements from 2 specified sequences
 //
 // If resultSelector is nil, the default result is a slice combined with each element
-func (e Enumerable[T]) Zip(first TFirst, resultSelector CombinationSelector[T, any]) Enumerable[any] {
+func (e Enumerable[T]) Zip(second Enumerable[any], resultSelector CombinationSelector[T, any]) Enumerable[any] {
 	return Enumerable[any]{
 		getIter: func() <-chan any {
 			out := make(chan any)
 
 			go func() {
 				defer close(out)
-				var firstSlice []any
-				switch reflect.TypeOf(first).Kind() {
-				case reflect.Slice:
-					val := reflect.ValueOf(first)
-					for j := 0; j < val.Len(); j++ {
-						firstSlice = append(firstSlice, val.Index(j).Interface())
-					}
-				default:
-					val := reflect.ValueOf(first).MethodByName("ToSlice").Call([]reflect.Value{})[0]
-					for j := 0; j < val.Len(); j++ {
-						firstSlice = append(firstSlice, val.Index(j).Interface())
-					}
-				}
-				i := 0
+				secondIter := second.getIter()
 				for value := range e.getIter() {
+					secondValue := <-secondIter
 					if resultSelector == nil {
-						out <- []any{value, firstSlice[i]}
+						out <- []any{value, secondValue}
 					} else {
-						out <- resultSelector(value, firstSlice[i])
+						out <- resultSelector(value, secondValue)
 					}
-					i++
 				}
 			}()
 
