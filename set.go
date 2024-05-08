@@ -97,7 +97,7 @@ func (e Enumerable[T]) Except(second Enumerable[T]) Enumerable[T] {
 // that don't appear in a second collection according to a specified key selector function.
 //
 // In this method, comparer is returns whether left is equal to right or not, comparer can be nil without special comparer.
-func (e Enumerable[T]) ExceptBy(second Enumerable[T], keySelector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
+func (e Enumerable[T]) ExceptBy(second Enumerable[any], keySelector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
@@ -105,7 +105,7 @@ func (e Enumerable[T]) ExceptBy(second Enumerable[T], keySelector SingleSelector
 			go func() {
 				defer close(out)
 				if comparer == nil {
-					secondMap := second.ToMap(keySelector, func(t T) any {
+					secondMap := second.ToMap(func(a any) any { return a }, func(a any) any {
 						return struct{}{}
 					})
 					for value := range e.getIter() {
@@ -118,8 +118,7 @@ func (e Enumerable[T]) ExceptBy(second Enumerable[T], keySelector SingleSelector
 					}
 				} else {
 					setKey := []any{}
-					// because there is a loop for the second in the first, avoid duplicate logic for keySelector
-					secondKey := second.Select(keySelector).ToSlice()
+					secondKey := second.ToSlice()
 					for value := range e.getIter() {
 						fKey := keySelector(value)
 						exist := false
@@ -181,7 +180,7 @@ func (e Enumerable[T]) Intersect(second Enumerable[T]) Enumerable[T] {
 // that appear in each of two collections according to a specified key selector function.
 //
 // In this method, comparer is returns whether left is equal to right or not, comparer can be nil without special comparer.
-func (e Enumerable[T]) IntersectBy(second Enumerable[T], keySelector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
+func (e Enumerable[T]) IntersectBy(second Enumerable[any], keySelector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
@@ -189,7 +188,7 @@ func (e Enumerable[T]) IntersectBy(second Enumerable[T], keySelector SingleSelec
 			go func() {
 				defer close(out)
 				if comparer == nil {
-					secondMap := second.ToMap(keySelector, func(t T) any {
+					secondMap := second.ToMap(func(a any) any { return a }, func(t any) any {
 						return true
 					})
 					for value := range e.getIter() {
@@ -202,7 +201,7 @@ func (e Enumerable[T]) IntersectBy(second Enumerable[T], keySelector SingleSelec
 				} else {
 					setKey := []any{}
 					// because there is a loop for the second in the first, avoid duplicate logic for keySelector
-					secondKey := second.Select(keySelector).ToSlice()
+					secondKey := second.ToSlice()
 					for value := range e.getIter() {
 						fKey := keySelector(value)
 						exist := false

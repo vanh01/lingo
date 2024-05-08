@@ -672,9 +672,9 @@ source := []Student{
 	{Id: 3, Name: "A"},
 }
 
-second := []Student{
-	{Id: 1, Name: "Anh"},
-	{Id: 2, Name: "hnA"},
+second := []any{
+	"Anh",
+	"hnA",
 }
 
 enumerable := lingo.AsEnumerable(source).ExceptBy(lingo.AsEnumerable(second), func(s Student) any {
@@ -726,9 +726,9 @@ source := []Student{
 	{Id: 3, Name: "A"},
 }
 
-second := []Student{
-	{Id: 1, Name: "Anh"},
-	{Id: 2, Name: "hnA"},
+second := []any{
+	"Anh",
+	"hnA",
 }
 
 enumerable := lingo.AsEnumerable(source).IntersectBy(lingo.AsEnumerable(second), func(s Student) any {

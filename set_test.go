@@ -215,7 +215,7 @@ func TestExceptBy(t *testing.T) {
 		Level int
 	}
 	type args struct {
-		second      []Student
+		second      []any
 		keySelector lingo.SingleSelector[Student]
 		comparer    lingo.Comparer[any]
 	}
@@ -237,9 +237,9 @@ func TestExceptBy(t *testing.T) {
 				{Id: 3, Name: "Anh3", Level: 2},
 			},
 			args: args{
-				second: []Student{
-					{Id: 2, Name: "An", Level: 2},
-					{Id: 3, Name: "Anh", Level: 2},
+				second: []any{
+					"An",
+					"Anh",
 				},
 				keySelector: func(s Student) any {
 					return s.Name
@@ -263,10 +263,10 @@ func TestExceptBy(t *testing.T) {
 				{Id: 1, Name: "Nam", Level: 1},
 			},
 			args: args{
-				second: []Student{
-					{Id: 2, Name: "An", Level: 2},
-					{Id: 2, Name: "An", Level: 2},
-					{Id: 3, Name: "Anh", Level: 2},
+				second: []any{
+					Student{Id: 2, Name: "An", Level: 2},
+					Student{Id: 2, Name: "An", Level: 2},
+					Student{Id: 3, Name: "Anh", Level: 2},
 				},
 				keySelector: func(s Student) any {
 					return s
@@ -368,7 +368,7 @@ func TestIntersectBy(t *testing.T) {
 		Level int
 	}
 	type args struct {
-		second      []Student
+		second      []any
 		keySelector lingo.SingleSelector[Student]
 		comparer    lingo.Comparer[any]
 	}
@@ -388,12 +388,12 @@ func TestIntersectBy(t *testing.T) {
 				{Id: 3, Name: "Anh", Level: 2},
 			},
 			args: args{
-				second: []Student{
-					{Id: 2, Name: "An", Level: 2},
-					{Id: 3, Name: "Anh", Level: 2},
-					{Id: 3, Name: "Anh", Level: 2},
-					{Id: 4, Name: "An", Level: 2},
-					{Id: 5, Name: "Anh", Level: 2},
+				second: []any{
+					"An",
+					"Anh",
+					"Anh",
+					"An",
+					"Anh",
 				},
 				keySelector: func(s Student) any {
 					return s.Name
@@ -417,12 +417,12 @@ func TestIntersectBy(t *testing.T) {
 				{Id: 3, Name: "Anh", Level: 2},
 			},
 			args: args{
-				second: []Student{
-					{Id: 2, Name: "An", Level: 2},
-					{Id: 3, Name: "Anh", Level: 2},
-					{Id: 3, Name: "Anh", Level: 2},
-					{Id: 4, Name: "An", Level: 2},
-					{Id: 5, Name: "Anh", Level: 2},
+				second: []any{
+					"An",
+					"Anh",
+					"Anh",
+					"An",
+					"Anh",
 				},
 				keySelector: func(s Student) any {
 					return s.Name
