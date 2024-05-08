@@ -7,6 +7,9 @@ import (
 // SingleSelector represents a function that converts an object under T type to another object
 type SingleSelector[T any] func(T) any
 
+// SingleSelectorFull represents a function that converts an object under T type to another object under K type
+type SingleSelectorFull[T any, K any] func(T) K
+
 // CombinationSelector represents a function that combines two objects under T, K type to another object
 type CombinationSelector[T any, K any] func(T, K) any
 
