@@ -114,7 +114,10 @@ func (e Enumerable[T]) Insert(index int, t T) Enumerable[T] {
 }
 
 // Remove removes the first occurrence of the given element, if found.
-func (e Enumerable[T]) Remove(t T, comparer Comparer[T]) Enumerable[T] {
+//
+// If comparer is empty or nil, we will use the default comparer.
+// On the other hand, we just use the first comparer
+func (e Enumerable[T]) Remove(t T, comparer ...Comparer[T]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
@@ -124,11 +127,11 @@ func (e Enumerable[T]) Remove(t T, comparer Comparer[T]) Enumerable[T] {
 				isFirst := true
 				for value := range e.getIter() {
 					if isFirst {
-						if comparer != nil && comparer(value, t) {
+						if !isEmptyOrNil(comparer) && comparer[0](value, t) {
 							isFirst = false
 							continue
 						}
-						if comparer == nil && reflect.ValueOf(value).Interface() == reflect.ValueOf(t).Interface() {
+						if isEmptyOrNil(comparer) && reflect.ValueOf(value).Interface() == reflect.ValueOf(t).Interface() {
 							isFirst = false
 							continue
 						}

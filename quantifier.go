@@ -26,15 +26,18 @@ func (e Enumerable[T]) Any(predicate Predicate[T]) bool {
 
 // Contains determines whether a sequence contains a specified element.
 //
-// in this method, comparer is returns whether left is equal to right or not.
-func (e Enumerable[T]) Contains(value T, comparer Comparer[T]) bool {
+// In this method, comparer is returns whether left is equal to right or not.
+//
+// If comparer is empty or nil, we will use the default comparer.
+// On the other hand, we just use the first comparer
+func (e Enumerable[T]) Contains(value T, comparer ...Comparer[T]) bool {
 	for v := range e.getIter() {
-		if comparer == nil {
+		if isEmptyOrNil(comparer) {
 			if reflect.ValueOf(v).Interface() == reflect.ValueOf(value).Interface() {
 				return true
 			}
 		} else {
-			if comparer(v, value) {
+			if comparer[0](v, value) {
 				return true
 			}
 		}

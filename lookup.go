@@ -32,19 +32,19 @@ type Grouping[K any, V any] struct {
 
 // AsLookup Creates a generic Lookup[K, V] from an Enumerable[T].
 //
-// elementSelector can be nil.
+// elementSelector can be nil. If elementSelector is not empty or nil, we will use the first elementSelector
 func AsLookup[T any, K any, V any](
 	e Enumerable[T],
 	keySelector SingleSelectorFull[T, K],
-	elementSelector SingleSelectorFull[T, V],
+	elementSelector ...SingleSelectorFull[T, V],
 ) Lookup[K, V] {
 	// group by section
 	res := map[any][]V{}
 	for value := range e.getIter() {
 		var element V
 		key := keySelector(value)
-		if elementSelector != nil {
-			element = elementSelector(value)
+		if !isEmptyOrNil(elementSelector) {
+			element = elementSelector[0](value)
 		} else {
 			temp, ok := any(value).(V)
 			if !ok {

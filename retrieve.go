@@ -3,13 +3,13 @@ package lingo
 // FirstOrNil returns the first element of a sequence (with condition if any),
 // or a nil value if no element is found
 //
-// the predicate can be nil
-func (e Enumerable[T]) FirstOrNil(predicate Predicate[T]) T {
+// predicate can be nil. If predicate is not empty or nil, we will use the first predicate
+func (e Enumerable[T]) FirstOrNil(predicate ...Predicate[T]) T {
 	var t T
 	first := true
 	for value := range e.getIter() {
-		if predicate != nil {
-			if !predicate(value) {
+		if !isEmptyOrNil(predicate) {
+			if !predicate[0](value) {
 				continue
 			}
 		}
@@ -24,13 +24,13 @@ func (e Enumerable[T]) FirstOrNil(predicate Predicate[T]) T {
 // FirstOrDefault returns the first element of a sequence (with condition if any),
 // or a default value if no element is found
 //
-// the predicate can be nil
-func (e Enumerable[T]) FirstOrDefault(defaultValue T, predicate Predicate[T]) T {
+// predicate can be nil. If predicate is not empty or nil, we will use the first predicate
+func (e Enumerable[T]) FirstOrDefault(defaultValue T, predicate ...Predicate[T]) T {
 	var t T = defaultValue
 	first := true
 	for value := range e.getIter() {
-		if predicate != nil {
-			if !predicate(value) {
+		if !isEmptyOrNil(predicate) {
+			if !predicate[0](value) {
 				continue
 			}
 		}
@@ -45,12 +45,12 @@ func (e Enumerable[T]) FirstOrDefault(defaultValue T, predicate Predicate[T]) T 
 // LastOrNil returns the last element of a sequence (with condition if any),
 // or a nil value if no element is found
 //
-// the predicate can be nil
-func (e Enumerable[T]) LastOrNil(predicate Predicate[T]) T {
+// predicate can be nil. If predicate is not empty or nil, we will use the first predicate
+func (e Enumerable[T]) LastOrNil(predicate ...Predicate[T]) T {
 	var t T
 	for value := range e.getIter() {
-		if predicate != nil {
-			if !predicate(value) {
+		if !isEmptyOrNil(predicate) {
+			if !predicate[0](value) {
 				continue
 			}
 		}
@@ -62,12 +62,12 @@ func (e Enumerable[T]) LastOrNil(predicate Predicate[T]) T {
 // LastOrDefault returns the last element of a sequence (with condition if any),
 // or a default value if no element is found
 //
-// the predicate can be nil
-func (e Enumerable[T]) LastOrDefault(defaultValue T, predicate Predicate[T]) T {
+// predicate can be nil. If predicate is not empty or nil, we will use the first predicate
+func (e Enumerable[T]) LastOrDefault(defaultValue T, predicate ...Predicate[T]) T {
 	var t T = defaultValue
 	for value := range e.getIter() {
-		if predicate != nil {
-			if !predicate(value) {
+		if !isEmptyOrNil(predicate) {
+			if !predicate[0](value) {
 				continue
 			}
 		}

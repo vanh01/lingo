@@ -89,11 +89,11 @@ func main() {
 
 	enumerable := lingo.AsEnumerable(source).
 		Where(func(t Student) bool {
-			return lingo.AsEnumerable(classIds).Contains(t.ClassId, nil)
+			return lingo.AsEnumerable(classIds).Contains(t.ClassId)
 		}).
 		OrderByDescending(func(s Student) any {
 			return s.Score
-		}, nil).
+		}).
 		Take(3)
 	fmt.Println(enumerable.ToSlice())
 }
@@ -263,9 +263,9 @@ source := []Student{
 }
 lookup := lingo.AsLookup[Student, int, Student](lingo.AsEnumerable(source), func(s Student) int {
 	return s.ClassId
-}, nil)
+})
 
-for grouping := range lookup.OrderByDescending(func(g lingo.Grouping[int, Student]) any { return g.Key }, nil).GetIter() {
+for grouping := range lookup.OrderByDescending(func(g lingo.Grouping[int, Student]) any { return g.Key }).GetIter() {
 	fmt.Printf("%d:\n", grouping.Key)
 	for v := range grouping.GetIter() {
 		fmt.Println("\t", v)
@@ -344,7 +344,7 @@ Remove removes the first occurrence of the given element, if found.
 Example:
 ```go
 enum := lingo.Range(1, 10)
-enum.Remove(9, nil).ToSlice() // 1-8, 10
+enum.Remove(9).ToSlice() // 1-8, 10
 ```
 
 #### RemoveAt
@@ -372,7 +372,7 @@ FirstOrNil returns the first element of a sequence (with condition if any), or a
 Example:
 ```go
 enumerable := lingo.Range(1, 10)
-first := enumerable.FirstOrNil(nil) // 1
+first := enumerable.FirstOrNil() // 1
 ```
 #### FirstOrDefault
 FirstOrDefault returns the first element of a sequence (with condition if any), or a default value if no element is found
@@ -380,7 +380,7 @@ FirstOrDefault returns the first element of a sequence (with condition if any), 
 Example:
 ```go
 enumerable := lingo.Empty[int]()
-first := enumerable.FirstOrDefault(-999, nil) // -999
+first := enumerable.FirstOrDefault(-999) // -999
 ```
 #### LastOrNil
 LastOrNil returns the last element of a sequence (with condition if any), or a nil value if no element is found
@@ -388,7 +388,7 @@ LastOrNil returns the last element of a sequence (with condition if any), or a n
 Example:
 ```go
 enumerable := lingo.Empty[int]()
-last := enumerable.LastOrNil(nil) // 0
+last := enumerable.LastOrNil() // 0
 ```
 #### LastOrDefault
 LastOrDefault returns the last element of a sequence (with condition if any), or a default value if no element is found
@@ -396,7 +396,7 @@ LastOrDefault returns the last element of a sequence (with condition if any), or
 Example:
 ```go
 enumerable := lingo.Empty[int]()
-last := enumerable.LastOrDefault(999, nil) // 999
+last := enumerable.LastOrDefault(999) // 999
 ```
 #### ElementAtOrNil
 ElementAtOrNil returns the element at a specified index in a sequence or a default value if the index is out of range.
@@ -523,28 +523,31 @@ source := []Student{
 }
 classIds := []int{11, 22, 33}
 
-enumerable := lingo.AsEnumerable(source).Zip(classIds, nil)
+enumerable := lingo.AsEnumerable(source).Zip(lingo.AsEnumerableAnyFromSliceT(classIds))
 fmt.Println(enumerable.ToSlice())
 // Result: [[{1 Anh} 11] [{2 An} 22] [{3 A} 33]]
 ```
 
 ### Aggregation operations
 #### Min
-Min returns the minimum value in a sequence of values. In this method, comparer is returns whether left is smaller than right or not, if comparer is nill, we will use the default comparer.
+Min returns the minimum value in a sequence of values.
+In this method, comparer is returns whether left is smaller than right or not. The left one will be returned
+If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
 
 Example:
 ```go
 enumerable := lingo.Range(1, 100)
-m := enumerable.Min(nil) // 1
+m := enumerable.Min() // 1
 ```
 #### Max
 Max returns the minimum value in a sequence of values.
-In this method, comparer is returns whether left is greater than right or not, if comparer is nill, we will use the default comparer.
+In this method, comparer is returns whether left is greater than right or not. The left one will be returned
+If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
 
 Example:
 ```go
 enumerable := lingo.Range(1, 100)
-m := enumerable.Max(nil) // 100
+m := enumerable.Max() // 100
 ```
 #### Sum
 Sum computes the sum of a sequence of numeric values.
@@ -552,7 +555,7 @@ Sum computes the sum of a sequence of numeric values.
 Example:
 ```go
 enumerable := lingo.Range(1, 100)
-sum := enumerable.Sum(nil) // 5050
+sum := enumerable.Sum() // 5050
 ```
 #### Average
 Average computes the average of a sequence of numeric values.
@@ -560,7 +563,7 @@ Average computes the average of a sequence of numeric values.
 Example:
 ```go
 enumerable := lingo.Range(1, 100)
-sum := enumerable.Average(nil) // 50.5
+sum := enumerable.Average() // 50.5
 ```
 #### Count
 Count returns the number of elements in a sequence.
@@ -583,7 +586,6 @@ reversed := lingo.AsEnumerable(word).Aggregate(
 	func(a any, s string) any {
 		return s + " " + a.(string)
 	},
-	nil,
 )
 fmt.Println(reversed)
 // Result: "dog lazy the over jumps fox brown quick the"
@@ -629,7 +631,7 @@ source := []Student{
 
 enumerable := lingo.AsEnumerable(source).DistinctBy(func(s Student) any {
 	return len(s.Name)
-}, nil)
+})
 fmt.Println(enumerable.ToSlice())
 // Result: [{1 Anh} {3 A}]
 ```
@@ -679,7 +681,7 @@ second := []any{
 
 enumerable := lingo.AsEnumerable(source).ExceptBy(lingo.AsEnumerable(second), func(s Student) any {
 	return s.Name
-}, nil)
+})
 fmt.Println(enumerable.ToSlice())
 // Result: [{3 A}]
 ```
@@ -733,7 +735,7 @@ second := []any{
 
 enumerable := lingo.AsEnumerable(source).IntersectBy(lingo.AsEnumerable(second), func(s Student) any {
 	return s.Name
-}, nil)
+})
 fmt.Println(enumerable.ToSlice())
 // Result: [{1 Anh} {2 hnA}]
 ```
@@ -781,7 +783,7 @@ second := []Student{
 
 enumerable := lingo.AsEnumerable(source).UnionBy(lingo.AsEnumerable(second), func(s Student) any {
 	return s.Name
-}, nil)
+})
 fmt.Println(enumerable.ToSlice())
 // Result: [{1 Anh} {2 hnA} {3 A}]
 ```
@@ -802,7 +804,7 @@ source := []Student{
 
 enumerable := lingo.AsEnumerable(source).OrderBy(func(s Student) any {
 	return s.Id
-}, nil)
+})
 fmt.Println(enumerable.ToSlice())
 // Result: [{1 Anh} {3 A} {5 hnA}]
 ```
@@ -838,7 +840,7 @@ source := []Student{
 
 enumerable := lingo.AsEnumerable(source).OrderByDescending(func(s Student) any {
 	return s.Id
-}, nil)
+})
 fmt.Println(enumerable.ToSlice())
 // Result: [{5 hnA} {3 A} {1 Anh}]
 ```
@@ -1124,7 +1126,7 @@ arg := args{
 	resultSelector: func(a1 any, a2 []any) any {
 		ss := lingo.AsEnumerableTFromSliceAny[Student](a2).OrderByDescending(func(s Student) any {
 			return s.Score
-		}, nil).ToSlice()
+		}).ToSlice()
 		s := ss[0]
 		return Student{
 			Id:      s.Id,

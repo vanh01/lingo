@@ -1,13 +1,17 @@
 package lingo
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // Min returns the minimum value in a sequence of values.
 //
-// in this method, comparer is returns whether left is smaller than right or not
+// In this method, comparer is returns whether left is smaller than right or not.
+// The left one will be returned
 //
-// if comparer is nill, we will use the default comparer
-func (e Enumerable[T]) Min(comparer Comparer[T]) T {
+// If comparer is empty or nil, we will use the default comparer.
+// On the other hand, we just use the first comparer
+func (e Enumerable[T]) Min(comparer ...Comparer[T]) T {
 	var t T
 	first := true
 	for value := range e.getIter() {
@@ -15,11 +19,11 @@ func (e Enumerable[T]) Min(comparer Comparer[T]) T {
 			t = value
 			first = false
 		}
-		if comparer == nil {
+		if isEmptyOrNil(comparer) {
 			if defaultLessComparer(value, t) {
 				t = value
 			}
-		} else if comparer(value, t) {
+		} else if comparer[0](value, t) {
 			t = value
 		}
 	}
@@ -28,10 +32,12 @@ func (e Enumerable[T]) Min(comparer Comparer[T]) T {
 
 // Max returns the minimum value in a sequence of values.
 //
-// in this method, comparer is returns whether left is greater than right or not
+// In this method, comparer is returns whether left is greater than right or not.
+// The left one will be returned
 //
-// if comparer is nill, we will use the default comparer
-func (e Enumerable[T]) Max(comparer Comparer[T]) T {
+// If comparer is empty or nil, we will use the default comparer.
+// On the other hand, we just use the first comparer
+func (e Enumerable[T]) Max(comparer ...Comparer[T]) T {
 	var t T
 	first := true
 	for value := range e.getIter() {
@@ -39,11 +45,11 @@ func (e Enumerable[T]) Max(comparer Comparer[T]) T {
 			t = value
 			first = false
 		}
-		if comparer == nil {
+		if isEmptyOrNil(comparer) {
 			if defaultMoreComparer(value, t) {
 				t = value
 			}
-		} else if comparer(value, t) {
+		} else if comparer[0](value, t) {
 			t = value
 		}
 	}
@@ -51,15 +57,17 @@ func (e Enumerable[T]) Max(comparer Comparer[T]) T {
 }
 
 // Sum computes the sum of a sequence of numeric values.
-func (e Enumerable[T]) Sum(selector SingleSelector[T]) any {
+//
+// If selector is not empty or nil, we will use the first comparer
+func (e Enumerable[T]) Sum(selector ...SingleSelector[T]) any {
 	var sumInt64 int64 = 0
 	var sumUint64 uint64 = 0
 	var sumFloat64 float64 = 0
 	var temp any
 	for value := range e.getIter() {
 		temp = value
-		if selector != nil {
-			temp = selector(value)
+		if !isEmptyOrNil(selector) {
+			temp = selector[0](value)
 		}
 		if !isNumber(temp) {
 			break
@@ -83,7 +91,9 @@ func (e Enumerable[T]) Sum(selector SingleSelector[T]) any {
 }
 
 // Average computes the average of a sequence of numeric values.
-func (e Enumerable[T]) Average(selector SingleSelector[T]) float64 {
+//
+// If selector is not empty or nil, we will use the first comparer
+func (e Enumerable[T]) Average(selector ...SingleSelector[T]) float64 {
 	var sumInt64 int64 = 0
 	var sumUint64 uint64 = 0
 	var sumFloat64 float64 = 0
@@ -91,8 +101,8 @@ func (e Enumerable[T]) Average(selector SingleSelector[T]) float64 {
 	i := 0
 	for value := range e.getIter() {
 		temp = value
-		if selector != nil {
-			temp = selector(value)
+		if !isEmptyOrNil(selector) {
+			temp = selector[0](value)
 		}
 		if !isNumber(temp) {
 			break
@@ -130,20 +140,20 @@ func (e Enumerable[T]) Count() int64 {
 // The specified seed value is used as the initial accumulator value,
 // and the specified function is used to select the result value.
 //
-// resultSelector can be nil
+// # If resultSelector is not empty or nil, we will use the first comparer
 //
 // # Noted that the type of seed, the left type of Accumulator function and the input type of selector must be the same
 func (e Enumerable[T]) Aggregate(
 	seed any,
 	accumulator Accumulator[any, T],
-	resultSelector SingleSelector[any],
+	resultSelector ...SingleSelector[any],
 ) any {
 	var res any = seed
 	for value := range e.getIter() {
 		res = accumulator(res, value)
 	}
-	if resultSelector != nil {
-		return resultSelector(res)
+	if !isEmptyOrNil(resultSelector) {
+		return resultSelector[0](res)
 	}
 	return res
 }

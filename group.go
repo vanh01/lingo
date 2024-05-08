@@ -2,9 +2,9 @@ package lingo
 
 // GroupBy groups elements that share a common attribute.
 //
-// in this method, comparer is returns whether left is equal to right or not.
+// In this method, getHash returns the key of the grouping.
 //
-// elementSelector, comparer can be nil
+// elementSelector, getHash can be nil
 func (e Enumerable[T]) GroupBy(
 	keySelector SingleSelector[T],
 	elementSelector SingleSelector[T],

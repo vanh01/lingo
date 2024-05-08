@@ -239,7 +239,7 @@ func TestRemove(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := lingo.AsEnumerable(tt.source).Remove(tt.args.num, nil).ToSlice()
+			got := lingo.AsEnumerable(tt.source).Remove(tt.args.num).ToSlice()
 			if len(got) != len(tt.want) {
 				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
 			}

@@ -171,7 +171,7 @@ func TestSum(t *testing.T) {
 			name: "Sum",
 			args: args[any]{
 				selector: func(a any) any {
-					return a.(Student).Id
+					return a.(Student).ClassId
 				},
 				source: lingo.SliceTToAny([]Student{
 					{Id: 1, Name: "1", ClassId: 9},

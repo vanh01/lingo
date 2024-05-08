@@ -49,7 +49,8 @@ func (e Enumerable[T]) SelectMany(selector SingleSelector[T]) Enumerable[any] {
 // Zip produces a sequence of tuples with elements from 2 specified sequences
 //
 // If resultSelector is nil, the default result is a slice combined with each element
-func (e Enumerable[T]) Zip(second Enumerable[any], resultSelector CombinationSelector[T, any]) Enumerable[any] {
+// On the other hand, we just use the first resultSelector
+func (e Enumerable[T]) Zip(second Enumerable[any], resultSelector ...CombinationSelector[T, any]) Enumerable[any] {
 	return Enumerable[any]{
 		getIter: func() <-chan any {
 			out := make(chan any)
@@ -59,10 +60,10 @@ func (e Enumerable[T]) Zip(second Enumerable[any], resultSelector CombinationSel
 				secondIter := second.getIter()
 				for value := range e.getIter() {
 					secondValue := <-secondIter
-					if resultSelector == nil {
+					if isEmptyOrNil(resultSelector) {
 						out <- []any{value, secondValue}
 					} else {
-						out <- resultSelector(value, secondValue)
+						out <- resultSelector[0](value, secondValue)
 					}
 				}
 			}()

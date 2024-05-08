@@ -24,17 +24,16 @@ func (e Enumerable[T]) Distinct() Enumerable[T] {
 
 // DistinctBy removes duplicate values from a collection with keySelector and comparer,
 //
-// in this method, comparer is returns whether left is equal to right or not.
-//
-// comparer can be nil without special comparer.
-func (e Enumerable[T]) DistinctBy(keySelector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
+// In this method, comparer is returns whether left is equal to right or not.
+// If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+func (e Enumerable[T]) DistinctBy(keySelector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
 
 			go func() {
 				defer close(out)
-				if comparer == nil {
+				if isEmptyOrNil(comparer) {
 					m := map[any]struct{}{}
 					for value := range e.getIter() {
 						key := keySelector(value)
@@ -49,7 +48,7 @@ func (e Enumerable[T]) DistinctBy(keySelector SingleSelector[T], comparer Compar
 						key := keySelector(value)
 						exist := false
 						for i := range temp {
-							if comparer(key, temp[i]) {
+							if comparer[0](key, temp[i]) {
 								exist = true
 								break
 							}
@@ -96,15 +95,16 @@ func (e Enumerable[T]) Except(second Enumerable[T]) Enumerable[T] {
 // ExceptBy returns the set difference, which means the elements of one collection
 // that don't appear in a second collection according to a specified key selector function.
 //
-// In this method, comparer is returns whether left is equal to right or not, comparer can be nil without special comparer.
-func (e Enumerable[T]) ExceptBy(second Enumerable[any], keySelector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
+// In this method, comparer is returns whether left is equal to right or not.
+// If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+func (e Enumerable[T]) ExceptBy(second Enumerable[any], keySelector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
 
 			go func() {
 				defer close(out)
-				if comparer == nil {
+				if isEmptyOrNil(comparer) {
 					secondMap := second.ToMap(func(a any) any { return a }, func(a any) any {
 						return struct{}{}
 					})
@@ -123,7 +123,7 @@ func (e Enumerable[T]) ExceptBy(second Enumerable[any], keySelector SingleSelect
 						fKey := keySelector(value)
 						exist := false
 						for i := range setKey {
-							if comparer(fKey, setKey[i]) {
+							if comparer[0](fKey, setKey[i]) {
 								exist = true
 								break
 							}
@@ -132,7 +132,7 @@ func (e Enumerable[T]) ExceptBy(second Enumerable[any], keySelector SingleSelect
 							continue
 						}
 						for i := range secondKey {
-							if comparer(fKey, secondKey[i]) {
+							if comparer[0](fKey, secondKey[i]) {
 								exist = true
 								break
 							}
@@ -179,15 +179,16 @@ func (e Enumerable[T]) Intersect(second Enumerable[T]) Enumerable[T] {
 // IntersectBy returns the set intersection, which means elements
 // that appear in each of two collections according to a specified key selector function.
 //
-// In this method, comparer is returns whether left is equal to right or not, comparer can be nil without special comparer.
-func (e Enumerable[T]) IntersectBy(second Enumerable[any], keySelector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
+// In this method, comparer is returns whether left is equal to right or not.
+// If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+func (e Enumerable[T]) IntersectBy(second Enumerable[any], keySelector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
 
 			go func() {
 				defer close(out)
-				if comparer == nil {
+				if isEmptyOrNil(comparer) {
 					secondMap := second.ToMap(func(a any) any { return a }, func(t any) any {
 						return true
 					})
@@ -206,7 +207,7 @@ func (e Enumerable[T]) IntersectBy(second Enumerable[any], keySelector SingleSel
 						fKey := keySelector(value)
 						exist := false
 						for i := range setKey {
-							if comparer(fKey, setKey[i]) {
+							if comparer[0](fKey, setKey[i]) {
 								exist = true
 								break
 							}
@@ -215,7 +216,7 @@ func (e Enumerable[T]) IntersectBy(second Enumerable[any], keySelector SingleSel
 							continue
 						}
 						for i := range secondKey {
-							if comparer(fKey, secondKey[i]) {
+							if comparer[0](fKey, secondKey[i]) {
 								exist = true
 								break
 							}
@@ -265,15 +266,16 @@ func (e Enumerable[T]) Union(second Enumerable[T]) Enumerable[T] {
 // UnionBy returns the set union, which means unique elements that
 // appear in either of two collections according to a specified key selector function.
 //
-// In this method, comparer is returns whether left is equal to right or not, comparer can be nil without special comparer.
-func (e Enumerable[T]) UnionBy(second Enumerable[T], keySelector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
+// In this method, comparer is returns whether left is equal to right or not.
+// If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+func (e Enumerable[T]) UnionBy(second Enumerable[T], keySelector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
 
 			go func() {
 				defer close(out)
-				if comparer == nil {
+				if isEmptyOrNil(comparer) {
 					m := map[any]struct{}{}
 					for value := range e.getIter() {
 						key := keySelector(value)
@@ -295,7 +297,7 @@ func (e Enumerable[T]) UnionBy(second Enumerable[T], keySelector SingleSelector[
 						key := keySelector(value)
 						exist := false
 						for i := range setKey {
-							if comparer(key, setKey[i]) {
+							if comparer[0](key, setKey[i]) {
 								exist = true
 								break
 							}
@@ -310,7 +312,7 @@ func (e Enumerable[T]) UnionBy(second Enumerable[T], keySelector SingleSelector[
 						key := keySelector(value)
 						exist := false
 						for i := range setKey {
-							if comparer(key, setKey[i]) {
+							if comparer[0](key, setKey[i]) {
 								exist = true
 								break
 							}

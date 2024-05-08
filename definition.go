@@ -297,3 +297,16 @@ func defaultMoreComparer[T any](t1, t2 T) bool {
 	}
 	return false
 }
+
+func isEmptyOrNil[T any](t []T) bool {
+	if reflect.ValueOf(t).IsNil() {
+		return true
+	}
+	if len(t) == 0 {
+		return true
+	}
+	if reflect.ValueOf(t[0]).IsNil() {
+		return true
+	}
+	return false
+}

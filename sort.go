@@ -23,16 +23,18 @@ func (s sorter[T, K]) Less(i, j int) bool {
 	return s.comparer(s.keys[i], s.keys[j])
 }
 
-func NewSorter[T any, K any](origin []T, source []K, comparer Comparer[K]) sorter[T, K] {
+func NewSorter[T any, K any](origin []T, source []K, comparer ...Comparer[K]) sorter[T, K] {
 	res := sorter[T, K]{
 		origin: origin,
 		keys:   source,
 	}
-	var comp Comparer[K] = comparer
-	if comparer == nil {
+	var comp Comparer[K]
+	if isEmptyOrNil(comparer) {
 		comp = func(t1, t2 K) bool {
 			return defaultLessComparer(t1, t2)
 		}
+	} else {
+		comp = comparer[0]
 	}
 
 	res.comparer = comp
@@ -41,10 +43,9 @@ func NewSorter[T any, K any](origin []T, source []K, comparer Comparer[K]) sorte
 
 // OrderBy sorts values in ascending order.
 //
-// in this method, comparer is returns whether left is smaller than right or not
-//
-// if comparer is nill, we will use the default comparer
-func (e Enumerable[T]) OrderBy(selector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
+// In this method, comparer is returns whether left is smaller than right or not.
+// If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+func (e Enumerable[T]) OrderBy(selector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
@@ -53,7 +54,7 @@ func (e Enumerable[T]) OrderBy(selector SingleSelector[T], comparer Comparer[any
 				defer close(out)
 				origin := e.ToSlice()
 				source := AsEnumerable(origin).Select(selector).ToSlice()
-				sorter := NewSorter(origin, source, comparer)
+				sorter := NewSorter(origin, source, comparer...)
 				sort.Sort(sorter)
 				for _, value := range sorter.origin {
 					out <- value
@@ -67,8 +68,9 @@ func (e Enumerable[T]) OrderBy(selector SingleSelector[T], comparer Comparer[any
 
 // OrderByDescending sorts values in descending order.
 //
-// in this method, comparer is returns whether left is smaller than right or not
-func (e Enumerable[T]) OrderByDescending(selector SingleSelector[T], comparer Comparer[any]) Enumerable[T] {
+// In this method, comparer is returns whether left is smaller than right or not.
+// If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+func (e Enumerable[T]) OrderByDescending(selector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
@@ -80,7 +82,7 @@ func (e Enumerable[T]) OrderByDescending(selector SingleSelector[T], comparer Co
 					return
 				}
 				source := AsEnumerable(origin).Select(selector).ToSlice()
-				sorter := NewSorter(origin, source, comparer)
+				sorter := NewSorter(origin, source, comparer...)
 				oldComparer := sorter.comparer
 				sorter.comparer = func(a1, a2 any) bool {
 					return !oldComparer(a1, a2)
