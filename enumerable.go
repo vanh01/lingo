@@ -16,6 +16,24 @@ func (e Enumerable[T]) GetIter() <-chan T {
 	return e.getIter()
 }
 
+// AsEnumerable creates a new Enumerable from ParallelEnumerable
+func (p ParallelEnumerable[T]) AsEnumerable() Enumerable[T] {
+	return Enumerable[T]{
+		getIter: func() <-chan T {
+			ch := make(chan T)
+
+			go func() {
+				defer close(ch)
+				for value := range p.getIter() {
+					ch <- value
+				}
+			}()
+
+			return ch
+		},
+	}
+}
+
 // AsEnumerable creates a new Enumerable
 func AsEnumerable[T any](t []T) Enumerable[T] {
 	return Enumerable[T]{

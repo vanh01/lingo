@@ -56,3 +56,23 @@ func SliceTToAny[T any](source []T) []any {
 	}
 	return ins
 }
+
+// ParallelEnumerable
+
+// ToSlice converts the iterator into a slice
+func (p ParallelEnumerable[T]) ToSlice() []T {
+	res := []T{}
+	for data := range p.getIter() {
+		res = append(res, data)
+	}
+	return res
+}
+
+// ToMap converts the iterator into a map with specific selector
+func (p ParallelEnumerable[T]) ToMap(keySelector definition.SingleSelector[T], elementSelector definition.SingleSelector[T]) map[any]any {
+	res := map[any]any{}
+	for value := range p.getIter() {
+		res[keySelector(value)] = elementSelector(value)
+	}
+	return res
+}
