@@ -112,28 +112,28 @@ func (p ParallelEnumerable[T]) SelectMany(selector definition.SingleSelector[T])
 
 			go func() {
 				defer close(out)
-
 				dd := []any{}
+
 				outTemp := make(chan any)
-				defer close(outTemp)
-				var wg sync.WaitGroup
-
-				for value := range p.getIter() {
-					wg.Add(1)
-					temp := value
-					go func() {
-						defer wg.Done()
-						res := selector(temp)
-						outTemp <- res
-					}()
-				}
-
 				go func() {
-					for value := range outTemp {
-						dd = append(dd, value)
+					defer close(outTemp)
+					var wg sync.WaitGroup
+
+					for value := range p.getIter() {
+						wg.Add(1)
+						temp := value
+						go func() {
+							defer wg.Done()
+							res := selector(temp)
+							outTemp <- res
+						}()
 					}
+					wg.Wait()
 				}()
-				wg.Wait()
+
+				for value := range outTemp {
+					dd = append(dd, value)
+				}
 
 				for _, value := range dd {
 					resValue := reflect.ValueOf(value)
