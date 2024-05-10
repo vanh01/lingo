@@ -2,10 +2,12 @@ package lingo
 
 import (
 	"reflect"
+
+	"github.com/vanh01/lingo/definition"
 )
 
 // Select projects values that are based on a transform function.
-func (e Enumerable[T]) Select(selector SingleSelector[T]) Enumerable[any] {
+func (e Enumerable[T]) Select(selector definition.SingleSelector[T]) Enumerable[any] {
 	return Enumerable[any]{
 		getIter: func() <-chan any {
 			out := make(chan any)
@@ -23,7 +25,7 @@ func (e Enumerable[T]) Select(selector SingleSelector[T]) Enumerable[any] {
 }
 
 // SelectMany projects sequences of values that are based on a transform function and then flattens them into one sequence.
-func (e Enumerable[T]) SelectMany(selector SingleSelector[T]) Enumerable[any] {
+func (e Enumerable[T]) SelectMany(selector definition.SingleSelector[T]) Enumerable[any] {
 	return Enumerable[any]{
 		getIter: func() <-chan any {
 			out := make(chan any)
@@ -50,7 +52,7 @@ func (e Enumerable[T]) SelectMany(selector SingleSelector[T]) Enumerable[any] {
 //
 // If resultSelector is nil, the default result is a slice combined with each element
 // On the other hand, we just use the first resultSelector
-func (e Enumerable[T]) Zip(second Enumerable[any], resultSelector ...CombinationSelector[T, any]) Enumerable[any] {
+func (e Enumerable[T]) Zip(second Enumerable[any], resultSelector ...definition.CombinationSelector[T, any]) Enumerable[any] {
 	return Enumerable[any]{
 		getIter: func() <-chan any {
 			out := make(chan any)
@@ -60,7 +62,7 @@ func (e Enumerable[T]) Zip(second Enumerable[any], resultSelector ...Combination
 				secondIter := second.getIter()
 				for value := range e.getIter() {
 					secondValue := <-secondIter
-					if isEmptyOrNil(resultSelector) {
+					if definition.IsEmptyOrNil(resultSelector) {
 						out <- []any{value, secondValue}
 					} else {
 						out <- resultSelector[0](value, secondValue)

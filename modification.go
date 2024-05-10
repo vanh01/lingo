@@ -1,6 +1,10 @@
 package lingo
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/vanh01/lingo/definition"
+)
 
 // Append appends a value to the end of the sequence.
 func (e Enumerable[T]) Append(t T) Enumerable[T] {
@@ -117,7 +121,7 @@ func (e Enumerable[T]) Insert(index int, t T) Enumerable[T] {
 //
 // If comparer is empty or nil, we will use the default comparer.
 // On the other hand, we just use the first comparer
-func (e Enumerable[T]) Remove(t T, comparer ...Comparer[T]) Enumerable[T] {
+func (e Enumerable[T]) Remove(t T, comparer ...definition.Comparer[T]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
@@ -127,11 +131,11 @@ func (e Enumerable[T]) Remove(t T, comparer ...Comparer[T]) Enumerable[T] {
 				isFirst := true
 				for value := range e.getIter() {
 					if isFirst {
-						if !isEmptyOrNil(comparer) && comparer[0](value, t) {
+						if !definition.IsEmptyOrNil(comparer) && comparer[0](value, t) {
 							isFirst = false
 							continue
 						}
-						if isEmptyOrNil(comparer) && reflect.ValueOf(value).Interface() == reflect.ValueOf(t).Interface() {
+						if definition.IsEmptyOrNil(comparer) && reflect.ValueOf(value).Interface() == reflect.ValueOf(t).Interface() {
 							isFirst = false
 							continue
 						}

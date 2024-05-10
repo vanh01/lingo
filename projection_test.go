@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	lingo "github.com/vanh01/lingo"
+	"github.com/vanh01/lingo/definition"
 )
 
 func TestSelect(t *testing.T) {
@@ -19,7 +20,7 @@ func TestSelect(t *testing.T) {
 		NameF string
 	}
 	type args struct {
-		s lingo.SingleSelector[Student]
+		s definition.SingleSelector[Student]
 	}
 	tests := []struct {
 		name   string
@@ -70,7 +71,7 @@ func TestSelectMany(t *testing.T) {
 		Total       int
 	}
 	type args struct {
-		s lingo.SingleSelector[Class]
+		s definition.SingleSelector[Class]
 	}
 	tests := []struct {
 		name   string
@@ -121,7 +122,7 @@ func TestZip(t *testing.T) {
 	}
 	type args struct {
 		first          lingo.Enumerable[any]
-		resultSelector lingo.CombinationSelector[Student, any]
+		resultSelector definition.CombinationSelector[Student, any]
 	}
 	tests := []struct {
 		name   string

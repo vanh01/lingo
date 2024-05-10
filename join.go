@@ -1,5 +1,7 @@
 package lingo
 
+import "github.com/vanh01/lingo/definition"
+
 // Join joins two sequences based on key selector functions and extracts pairs of values.
 //
 // In this method, comparer is returns whether left is equal to right or not.
@@ -8,10 +10,10 @@ package lingo
 // On the other hand, we just use the first comparer
 func (e Enumerable[T]) Join(
 	inner Enumerable[any],
-	outerKeySelector SingleSelector[T],
-	innerKeySelector SingleSelector[any],
-	resultSelector CombinationSelector[T, any],
-	comparer ...Comparer[any],
+	outerKeySelector definition.SingleSelector[T],
+	innerKeySelector definition.SingleSelector[any],
+	resultSelector definition.CombinationSelector[T, any],
+	comparer ...definition.Comparer[any],
 ) Enumerable[any] {
 	return Enumerable[any]{
 		getIter: func() <-chan any {
@@ -24,7 +26,7 @@ func (e Enumerable[T]) Join(
 					for _, i := range innerSlice {
 						outerKey := outerKeySelector(value)
 						innerKey := innerKeySelector(i)
-						if isEmptyOrNil(comparer) {
+						if definition.IsEmptyOrNil(comparer) {
 							if outerKey == innerKey {
 								out <- resultSelector(value, i)
 							}

@@ -1,5 +1,7 @@
 package lingo
 
+import "github.com/vanh01/lingo/definition"
+
 // Distinct removes duplicate values from a collection.
 func (e Enumerable[T]) Distinct() Enumerable[T] {
 	return Enumerable[T]{
@@ -26,14 +28,14 @@ func (e Enumerable[T]) Distinct() Enumerable[T] {
 //
 // In this method, comparer is returns whether left is equal to right or not.
 // If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
-func (e Enumerable[T]) DistinctBy(keySelector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
+func (e Enumerable[T]) DistinctBy(keySelector definition.SingleSelector[T], comparer ...definition.Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
 
 			go func() {
 				defer close(out)
-				if isEmptyOrNil(comparer) {
+				if definition.IsEmptyOrNil(comparer) {
 					m := map[any]struct{}{}
 					for value := range e.getIter() {
 						key := keySelector(value)
@@ -97,14 +99,14 @@ func (e Enumerable[T]) Except(second Enumerable[T]) Enumerable[T] {
 //
 // In this method, comparer is returns whether left is equal to right or not.
 // If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
-func (e Enumerable[T]) ExceptBy(second Enumerable[any], keySelector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
+func (e Enumerable[T]) ExceptBy(second Enumerable[any], keySelector definition.SingleSelector[T], comparer ...definition.Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
 
 			go func() {
 				defer close(out)
-				if isEmptyOrNil(comparer) {
+				if definition.IsEmptyOrNil(comparer) {
 					secondMap := second.ToMap(func(a any) any { return a }, func(a any) any {
 						return struct{}{}
 					})
@@ -181,14 +183,14 @@ func (e Enumerable[T]) Intersect(second Enumerable[T]) Enumerable[T] {
 //
 // In this method, comparer is returns whether left is equal to right or not.
 // If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
-func (e Enumerable[T]) IntersectBy(second Enumerable[any], keySelector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
+func (e Enumerable[T]) IntersectBy(second Enumerable[any], keySelector definition.SingleSelector[T], comparer ...definition.Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
 
 			go func() {
 				defer close(out)
-				if isEmptyOrNil(comparer) {
+				if definition.IsEmptyOrNil(comparer) {
 					secondMap := second.ToMap(func(a any) any { return a }, func(t any) any {
 						return true
 					})
@@ -268,14 +270,14 @@ func (e Enumerable[T]) Union(second Enumerable[T]) Enumerable[T] {
 //
 // In this method, comparer is returns whether left is equal to right or not.
 // If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
-func (e Enumerable[T]) UnionBy(second Enumerable[T], keySelector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
+func (e Enumerable[T]) UnionBy(second Enumerable[T], keySelector definition.SingleSelector[T], comparer ...definition.Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
 
 			go func() {
 				defer close(out)
-				if isEmptyOrNil(comparer) {
+				if definition.IsEmptyOrNil(comparer) {
 					m := map[any]struct{}{}
 					for value := range e.getIter() {
 						key := keySelector(value)

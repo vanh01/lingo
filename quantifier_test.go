@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	lingo "github.com/vanh01/lingo"
+	"github.com/vanh01/lingo/definition"
 )
 
 func TestAll(t *testing.T) {
@@ -126,7 +127,7 @@ func TestContains(t *testing.T) {
 	}
 	type args struct {
 		value Student
-		c     lingo.Comparer[Student]
+		c     definition.Comparer[Student]
 	}
 	tests := []struct {
 		name   string

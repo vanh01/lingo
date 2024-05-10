@@ -2,6 +2,8 @@ package lingo
 
 import (
 	"reflect"
+
+	"github.com/vanh01/lingo/definition"
 )
 
 // All determines whether all the elements in a sequence satisfy a condition.
@@ -30,9 +32,9 @@ func (e Enumerable[T]) Any(predicate Predicate[T]) bool {
 //
 // If comparer is empty or nil, we will use the default comparer.
 // On the other hand, we just use the first comparer
-func (e Enumerable[T]) Contains(value T, comparer ...Comparer[T]) bool {
+func (e Enumerable[T]) Contains(value T, comparer ...definition.Comparer[T]) bool {
 	for v := range e.getIter() {
-		if isEmptyOrNil(comparer) {
+		if definition.IsEmptyOrNil(comparer) {
 			if reflect.ValueOf(v).Interface() == reflect.ValueOf(value).Interface() {
 				return true
 			}

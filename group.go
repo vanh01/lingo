@@ -1,15 +1,17 @@
 package lingo
 
+import "github.com/vanh01/lingo/definition"
+
 // GroupBy groups elements that share a common attribute.
 //
 // In this method, getHash returns the key of the grouping.
 //
 // elementSelector, getHash can be nil
 func (e Enumerable[T]) GroupBy(
-	keySelector SingleSelector[T],
-	elementSelector SingleSelector[T],
-	resultSelector GroupBySelector[any, any],
-	getHash GetHashCode[any],
+	keySelector definition.SingleSelector[T],
+	elementSelector definition.SingleSelector[T],
+	resultSelector definition.GroupBySelector[any, any],
+	getHash definition.GetHashCode[any],
 ) Enumerable[any] {
 	return Enumerable[any]{
 		getIter: func() <-chan any {

@@ -3,6 +3,8 @@ package lingo
 import (
 	"reflect"
 	"unsafe"
+
+	"github.com/vanh01/lingo/definition"
 )
 
 type Enumerable[T any] struct {
@@ -45,8 +47,8 @@ func AsEnumerableTFromAny[T any](e Enumerable[any]) Enumerable[T] {
 				var temp T
 				for value := range e.getIter() {
 					switch {
-					case isNumber(temp):
-						out <- defaultConvertToNumber[T](value)
+					case definition.IsNumber(temp):
+						out <- definition.DefaultConvertToNumber[T](value)
 					case reflect.TypeOf(temp) == reflect.TypeOf(value):
 						out <- value.(T)
 					default:
@@ -92,8 +94,8 @@ func AsEnumerableTFromSliceAny[T any](a []any) Enumerable[T] {
 				var temp T
 				for _, value := range a {
 					switch {
-					case isNumber(temp):
-						out <- defaultConvertToNumber[T](value)
+					case definition.IsNumber(temp):
+						out <- definition.DefaultConvertToNumber[T](value)
 					case reflect.TypeOf(temp) == reflect.TypeOf(value):
 						out <- value.(T)
 					default:

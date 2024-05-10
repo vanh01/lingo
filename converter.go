@@ -3,6 +3,8 @@ package lingo
 import (
 	"reflect"
 	"unsafe"
+
+	"github.com/vanh01/lingo/definition"
 )
 
 // ToSlice converts the iterator into a slice
@@ -15,7 +17,7 @@ func (e Enumerable[T]) ToSlice() []T {
 }
 
 // ToMap converts the iterator into a map with specific selector
-func (e Enumerable[T]) ToMap(keySelector SingleSelector[T], elementSelector SingleSelector[T]) map[any]any {
+func (e Enumerable[T]) ToMap(keySelector definition.SingleSelector[T], elementSelector definition.SingleSelector[T]) map[any]any {
 	res := map[any]any{}
 	for value := range e.getIter() {
 		res[keySelector(value)] = elementSelector(value)
@@ -34,8 +36,8 @@ func SliceAnyToT[T any](source interface{}) []T {
 		for i := 0; i < sourceValue.Len(); i++ {
 			value := sourceValue.Index(i).Interface()
 			switch {
-			case isNumber(temp):
-				t[i] = defaultConvertToNumber[T](value)
+			case definition.IsNumber(temp):
+				t[i] = definition.DefaultConvertToNumber[T](value)
 			case reflect.TypeOf(temp) == reflect.TypeOf(value):
 				t[i] = value.(T)
 			default:

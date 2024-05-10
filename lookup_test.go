@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	lingo "github.com/vanh01/lingo"
+	"github.com/vanh01/lingo/definition"
 )
 
 func TestAsLookup(t *testing.T) {
@@ -13,8 +14,8 @@ func TestAsLookup(t *testing.T) {
 		ClassId int
 	}
 	type args struct {
-		keySelector     lingo.SingleSelectorFull[Student, int]
-		elementSelector lingo.SingleSelectorFull[Student, any]
+		keySelector     definition.SingleSelectorFull[Student, int]
+		elementSelector definition.SingleSelectorFull[Student, any]
 	}
 	type want struct {
 		count int
@@ -113,8 +114,8 @@ func TestContainsKey(t *testing.T) {
 		ClassId int
 	}
 	type args struct {
-		keySelector     lingo.SingleSelectorFull[Student, int]
-		elementSelector lingo.SingleSelectorFull[Student, any]
+		keySelector     definition.SingleSelectorFull[Student, int]
+		elementSelector definition.SingleSelectorFull[Student, any]
 	}
 	tests := []struct {
 		name   string
@@ -177,8 +178,8 @@ func TestGetValue(t *testing.T) {
 		ClassId int
 	}
 	type args struct {
-		keySelector     lingo.SingleSelectorFull[Student, int]
-		elementSelector lingo.SingleSelectorFull[Student, any]
+		keySelector     definition.SingleSelectorFull[Student, int]
+		elementSelector definition.SingleSelectorFull[Student, any]
 	}
 	type want struct {
 		count int

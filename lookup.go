@@ -1,6 +1,10 @@
 package lingo
 
-import "unsafe"
+import (
+	"unsafe"
+
+	"github.com/vanh01/lingo/definition"
+)
 
 // Lookup represents a collection of keys each mapped to one or more values.
 type Lookup[K any, V any] struct {
@@ -35,15 +39,15 @@ type Grouping[K any, V any] struct {
 // elementSelector can be nil. If elementSelector is not empty or nil, we will use the first elementSelector
 func AsLookup[T any, K any, V any](
 	e Enumerable[T],
-	keySelector SingleSelectorFull[T, K],
-	elementSelector ...SingleSelectorFull[T, V],
+	keySelector definition.SingleSelectorFull[T, K],
+	elementSelector ...definition.SingleSelectorFull[T, V],
 ) Lookup[K, V] {
 	// group by section
 	res := map[any][]V{}
 	for value := range e.getIter() {
 		var element V
 		key := keySelector(value)
-		if !isEmptyOrNil(elementSelector) {
+		if !definition.IsEmptyOrNil(elementSelector) {
 			element = elementSelector[0](value)
 		} else {
 			temp, ok := any(value).(V)

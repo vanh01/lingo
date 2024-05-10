@@ -2,6 +2,8 @@ package lingo
 
 import (
 	"reflect"
+
+	"github.com/vanh01/lingo/definition"
 )
 
 // Min returns the minimum value in a sequence of values.
@@ -11,7 +13,7 @@ import (
 //
 // If comparer is empty or nil, we will use the default comparer.
 // On the other hand, we just use the first comparer
-func (e Enumerable[T]) Min(comparer ...Comparer[T]) T {
+func (e Enumerable[T]) Min(comparer ...definition.Comparer[T]) T {
 	var t T
 	first := true
 	for value := range e.getIter() {
@@ -19,8 +21,8 @@ func (e Enumerable[T]) Min(comparer ...Comparer[T]) T {
 			t = value
 			first = false
 		}
-		if isEmptyOrNil(comparer) {
-			if defaultLessComparer(value, t) {
+		if definition.IsEmptyOrNil(comparer) {
+			if definition.DefaultLessComparer(value, t) {
 				t = value
 			}
 		} else if comparer[0](value, t) {
@@ -37,7 +39,7 @@ func (e Enumerable[T]) Min(comparer ...Comparer[T]) T {
 //
 // If comparer is empty or nil, we will use the default comparer.
 // On the other hand, we just use the first comparer
-func (e Enumerable[T]) Max(comparer ...Comparer[T]) T {
+func (e Enumerable[T]) Max(comparer ...definition.Comparer[T]) T {
 	var t T
 	first := true
 	for value := range e.getIter() {
@@ -45,8 +47,8 @@ func (e Enumerable[T]) Max(comparer ...Comparer[T]) T {
 			t = value
 			first = false
 		}
-		if isEmptyOrNil(comparer) {
-			if defaultMoreComparer(value, t) {
+		if definition.IsEmptyOrNil(comparer) {
+			if definition.DefaultMoreComparer(value, t) {
 				t = value
 			}
 		} else if comparer[0](value, t) {
@@ -59,32 +61,32 @@ func (e Enumerable[T]) Max(comparer ...Comparer[T]) T {
 // Sum computes the sum of a sequence of numeric values.
 //
 // If selector is not empty or nil, we will use the first comparer
-func (e Enumerable[T]) Sum(selector ...SingleSelector[T]) any {
+func (e Enumerable[T]) Sum(selector ...definition.SingleSelector[T]) any {
 	var sumInt64 int64 = 0
 	var sumUint64 uint64 = 0
 	var sumFloat64 float64 = 0
 	var temp any
 	for value := range e.getIter() {
 		temp = value
-		if !isEmptyOrNil(selector) {
+		if !definition.IsEmptyOrNil(selector) {
 			temp = selector[0](value)
 		}
-		if !isNumber(temp) {
+		if !definition.IsNumber(temp) {
 			break
 		}
 		switch {
-		case isInt(temp):
+		case definition.IsInt(temp):
 			sumInt64 += reflect.ValueOf(temp).Int()
-		case isUint(temp):
+		case definition.IsUint(temp):
 			sumUint64 += reflect.ValueOf(temp).Uint()
-		case isFloat(temp):
+		case definition.IsFloat(temp):
 			sumFloat64 += reflect.ValueOf(temp).Float()
 		}
 	}
-	if isInt(temp) {
+	if definition.IsInt(temp) {
 		return sumInt64
 	}
-	if isUint(temp) {
+	if definition.IsUint(temp) {
 		return sumUint64
 	}
 	return sumFloat64
@@ -93,7 +95,7 @@ func (e Enumerable[T]) Sum(selector ...SingleSelector[T]) any {
 // Average computes the average of a sequence of numeric values.
 //
 // If selector is not empty or nil, we will use the first comparer
-func (e Enumerable[T]) Average(selector ...SingleSelector[T]) float64 {
+func (e Enumerable[T]) Average(selector ...definition.SingleSelector[T]) float64 {
 	var sumInt64 int64 = 0
 	var sumUint64 uint64 = 0
 	var sumFloat64 float64 = 0
@@ -101,26 +103,26 @@ func (e Enumerable[T]) Average(selector ...SingleSelector[T]) float64 {
 	i := 0
 	for value := range e.getIter() {
 		temp = value
-		if !isEmptyOrNil(selector) {
+		if !definition.IsEmptyOrNil(selector) {
 			temp = selector[0](value)
 		}
-		if !isNumber(temp) {
+		if !definition.IsNumber(temp) {
 			break
 		}
 		switch {
-		case isInt(temp):
+		case definition.IsInt(temp):
 			sumInt64 += reflect.ValueOf(temp).Int()
-		case isUint(temp):
+		case definition.IsUint(temp):
 			sumUint64 += reflect.ValueOf(temp).Uint()
-		case isFloat(temp):
+		case definition.IsFloat(temp):
 			sumFloat64 += reflect.ValueOf(temp).Float()
 		}
 		i++
 	}
-	if isInt(temp) {
+	if definition.IsInt(temp) {
 		return float64(sumInt64) / float64(i)
 	}
-	if isUint(temp) {
+	if definition.IsUint(temp) {
 		return float64(sumUint64) / float64(i)
 	}
 	return sumFloat64 / float64(i)
@@ -145,14 +147,14 @@ func (e Enumerable[T]) Count() int64 {
 // # Noted that the type of seed, the left type of Accumulator function and the input type of selector must be the same
 func (e Enumerable[T]) Aggregate(
 	seed any,
-	accumulator Accumulator[any, T],
-	resultSelector ...SingleSelector[any],
+	accumulator definition.Accumulator[any, T],
+	resultSelector ...definition.SingleSelector[any],
 ) any {
 	var res any = seed
 	for value := range e.getIter() {
 		res = accumulator(res, value)
 	}
-	if !isEmptyOrNil(resultSelector) {
+	if !definition.IsEmptyOrNil(resultSelector) {
 		return resultSelector[0](res)
 	}
 	return res

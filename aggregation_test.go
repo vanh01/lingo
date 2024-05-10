@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	lingo "github.com/vanh01/lingo"
+	"github.com/vanh01/lingo/definition"
 )
 
 func TestMin(t *testing.T) {
@@ -15,7 +16,7 @@ func TestMin(t *testing.T) {
 		ClassId int
 	}
 	type args[T any] struct {
-		comparer lingo.Comparer[T]
+		comparer definition.Comparer[T]
 		source   []T
 		want     T
 	}
@@ -83,7 +84,7 @@ func TestMax(t *testing.T) {
 		ClassId int
 	}
 	type args[T any] struct {
-		comparer lingo.Comparer[T]
+		comparer definition.Comparer[T]
 		source   []T
 		want     T
 	}
@@ -145,7 +146,7 @@ func TestSum(t *testing.T) {
 		ClassId int
 	}
 	type args[T any] struct {
-		selector lingo.SingleSelector[T]
+		selector definition.SingleSelector[T]
 		source   []T
 		want     float64
 	}
@@ -218,7 +219,7 @@ func TestAverage(t *testing.T) {
 		ClassId int
 	}
 	type args[T any] struct {
-		selector lingo.SingleSelector[T]
+		selector definition.SingleSelector[T]
 		source   []T
 		want     float64
 	}
@@ -318,8 +319,8 @@ func TestAggregate(t *testing.T) {
 	type args struct {
 		source     []int
 		seed       int
-		accmulator lingo.Accumulator[any, int]
-		selector   lingo.SingleSelector[any]
+		accmulator definition.Accumulator[any, int]
+		selector   definition.SingleSelector[any]
 		want       int
 	}
 	tests := []struct {
