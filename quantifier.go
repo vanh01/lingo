@@ -77,7 +77,7 @@ func (p ParallelEnumerable[T]) All(predicate Predicate[T]) bool {
 	return true
 }
 
-// Any determines whether a parallel sequence contains any elements.
+// Any determines in parallel whether any element of a sequence satisfies a condition.
 func (p ParallelEnumerable[T]) Any(predicate Predicate[T]) bool {
 	res := make(chan bool)
 
