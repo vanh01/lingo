@@ -158,7 +158,7 @@ func (p ParallelEnumerable[T]) Zip(second ParallelEnumerable[any], resultSelecto
 
 					go func() {
 						defer wg.Done()
-						if resultSelector == nil {
+						if definition.IsEmptyOrNil(resultSelector) {
 							out <- []any{valueTemp, secondTemp}
 						} else {
 							valueTemp := resultSelector[0](valueTemp, secondTemp)
