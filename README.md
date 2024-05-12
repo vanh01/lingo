@@ -7,20 +7,27 @@
 lingo is a library written in Go. It is LinQ in .NET for Go. It will help the array processing code more neat.
 
 **The key features of lingo are:**
-- [Initialize enumerable](./docs/enumerable.md#initialize-enumerable)
-- [Initialize lookup](./docs/lookup.md#initialize-lookup)
-- [Modification enumerable](./docs/modification.md#modification-enumerable)
-- [Retrieve data](./docs/retrieve.md#retrieve-data)
-- [Filtering data](./docs/filter.md#filtering-data)
-- [Projection operations](./docs/projection.md#projection-operations)
-- [Aggregation operations](./docs/aggregation.md#aggregation-operations)
-- [Set operations](./docs/set.md#set-operations)
-- [Sorting data](./docs/sort.md#sorting-data)
-- [Quantifier operations](./docs/quantifier.md#quantifier-operations)
-- [Partitioning data](./docs/partition.md#partitioning-data)
-- [Convert data types](./docs/converter.md#converting-data-types)
-- [Join operations](./docs/join.md#join-operations)
-- [Group data](./docs/group.md#grouping-data)
+- Enumerable
+	- [Initialize enumerable](./docs/enumerable.md#initialize-enumerable)
+	- [Initialize lookup](./docs/lookup.md#initialize-lookup)
+	- [Modification enumerable](./docs/modification.md#modification-enumerable)
+	- [Retrieve data](./docs/retrieve.md#retrieve-data)
+	- [Filtering data](./docs/filter.md#filtering-data)
+	- [Projection operations](./docs/projection.md#projection-operations)
+	- [Aggregation operations](./docs/aggregation.md#aggregation-operations)
+	- [Set operations](./docs/set.md#set-operations)
+	- [Sorting data](./docs/sort.md#sorting-data)
+	- [Quantifier operations](./docs/quantifier.md#quantifier-operations)
+	- [Partitioning data](./docs/partition.md#partitioning-data)
+	- [Convert data types](./docs/converter.md#converting-data-types)
+	- [Join operations](./docs/join.md#join-operations)
+	- [Group data](./docs/group.md#grouping-data)
+- [Parallel](./docs/parallel.md)
+	- [Definition](./docs/parallel.md#definition)
+	- [Initialize PLINQ](./docs/parallel.md#initialize-plinq)
+	- [Filtering data](./docs/parallel.md#filtering-data)
+	- [Quantifier operations](./docs/parallel.md#quantifier-operations)
+	- [Aggregation operations](./docs/parallel.md#aggregation-operations)
 
 ## Getting started
 
