@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	lingo "github.com/vanh01/lingo"
+	"github.com/vanh01/lingo/definition"
 )
 
 func TestOrderBy(t *testing.T) {
@@ -13,8 +14,8 @@ func TestOrderBy(t *testing.T) {
 		Level uint
 	}
 	type args struct {
-		selector lingo.SingleSelector[Student]
-		comparer lingo.Comparer[any]
+		selector definition.SingleSelector[Student]
+		comparer definition.Comparer[any]
 	}
 	tests := []struct {
 		name   string
@@ -136,8 +137,8 @@ func TestOrderByDescending(t *testing.T) {
 		Level int
 	}
 	type args struct {
-		selector lingo.SingleSelector[Student]
-		comparer lingo.Comparer[any]
+		selector definition.SingleSelector[Student]
+		comparer definition.Comparer[any]
 	}
 	tests := []struct {
 		name   string

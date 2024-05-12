@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	lingo "github.com/vanh01/lingo"
+	"github.com/vanh01/lingo/definition"
 )
 
 func TestGroupBy(t *testing.T) {
@@ -13,10 +14,10 @@ func TestGroupBy(t *testing.T) {
 		ClassId int
 	}
 	type args struct {
-		keySelector     lingo.SingleSelector[Student]
-		elementSelector lingo.SingleSelector[Student]
-		resultSelector  lingo.GroupBySelector[any, any]
-		getHash         lingo.GetHashCode[any]
+		keySelector     definition.SingleSelector[Student]
+		elementSelector definition.SingleSelector[Student]
+		resultSelector  definition.GroupBySelector[any, any]
+		getHash         definition.GetHashCode[any]
 	}
 	tests := []struct {
 		name   string
