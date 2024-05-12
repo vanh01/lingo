@@ -32,7 +32,38 @@ func (e Enumerable[T]) Min(comparer ...definition.Comparer[T]) T {
 	return t
 }
 
-// Max returns the minimum value in a sequence of values.
+// MinBy returns the minimum value in a sequence of values according to a specified key selector function.
+//
+// In this method, comparer is returns whether left is smaller than right or not.
+// The left one will be returned
+//
+// If comparer is empty or nil, we will use the default comparer.
+// On the other hand, we just use the first comparer
+func (e Enumerable[T]) MinBy(selector definition.SingleSelector[T], comparer ...definition.Comparer[any]) T {
+	var t T
+	var minKey any
+	first := true
+	for value := range e.getIter() {
+		key := selector(value)
+		if first {
+			t = value
+			minKey = key
+			first = false
+		}
+		if definition.IsEmptyOrNil(comparer) {
+			if definition.DefaultLessComparer(key, minKey) {
+				t = value
+				minKey = key
+			}
+		} else if comparer[0](key, minKey) {
+			t = value
+			minKey = key
+		}
+	}
+	return t
+}
+
+// Max returns the maximum value in a sequence of values.
 //
 // In this method, comparer is returns whether left is greater than right or not.
 // The left one will be returned
@@ -53,6 +84,37 @@ func (e Enumerable[T]) Max(comparer ...definition.Comparer[T]) T {
 			}
 		} else if comparer[0](value, t) {
 			t = value
+		}
+	}
+	return t
+}
+
+// MaxBy returns the maximum value in a sequence of values according to a specified key selector function.
+//
+// In this method, comparer is returns whether left is smaller than right or not.
+// The left one will be returned
+//
+// If comparer is empty or nil, we will use the default comparer.
+// On the other hand, we just use the first comparer
+func (e Enumerable[T]) MaxBy(selector definition.SingleSelector[T], comparer ...definition.Comparer[any]) T {
+	var t T
+	var maxKey any
+	first := true
+	for value := range e.getIter() {
+		key := selector(value)
+		if first {
+			t = value
+			maxKey = key
+			first = false
+		}
+		if definition.IsEmptyOrNil(comparer) {
+			if definition.DefaultMoreComparer(key, maxKey) {
+				t = value
+				maxKey = key
+			}
+		} else if comparer[0](key, maxKey) {
+			t = value
+			maxKey = key
 		}
 	}
 	return t

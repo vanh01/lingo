@@ -111,7 +111,9 @@ The following table classifies each supported method, there are two types: Immed
 | Standard query operator | Return type | Immediate execution | Chain execution |
 |-|-|-|-|
 |[Min](#min)|T|x||
+|[MinBy](#minby)|T|x||
 |[Max](#max)|T|x||
+|[MaxBy](#maxby)|T|x||
 |[Sum](#sum)|Number|x||
 |[Average](#average)|float64|x||
 |[Count](#count)|int64|x||
@@ -539,6 +541,24 @@ Example:
 enumerable := lingo.Range(1, 100)
 m := enumerable.Min() // 1
 ```
+#### MinBy
+MinBy returns the minimum value in a sequence of values according to a specified key selector function.
+In this method, comparer is returns whether left is smaller than right or not. The left one will be returned
+If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+
+Example:
+```go
+source := []Student{
+    {Id: 1, Name: "Anh", ClassId: 1},
+    {Id: 2, Name: "hnA", ClassId: 2},
+    {Id: 3, Name: "Abcd", ClassId: 3},
+    {Id: 44, Name: "Ank", ClassId: 1},
+    {Id: 5, Name: "hnI", ClassId: 2},
+    {Id: 6, Name: "A", ClassId: 3},
+}
+lingo.AsEnumerable(source).MinBy(func(s Student) any { return s.Id })
+// {Id: 1, Name: "Anh", ClassId: 1}
+```
 #### Max
 Max returns the minimum value in a sequence of values.
 In this method, comparer is returns whether left is greater than right or not. The left one will be returned
@@ -548,6 +568,24 @@ Example:
 ```go
 enumerable := lingo.Range(1, 100)
 m := enumerable.Max() // 100
+```
+#### MaxBy
+MaxBy returns the maximum value in a sequence of values according to a specified key selector function.
+In this method, comparer is returns whether left is greater than right or not. The left one will be returned
+If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+
+Example:
+```go
+source := []Student{
+    {Id: 1, Name: "Anh", ClassId: 1},
+    {Id: 2, Name: "hnA", ClassId: 2},
+    {Id: 3, Name: "Abcd", ClassId: 3},
+    {Id: 44, Name: "Ank", ClassId: 1},
+    {Id: 5, Name: "hnI", ClassId: 2},
+    {Id: 6, Name: "A", ClassId: 3},
+}
+lingo.AsEnumerable(source).MaxBy(func(s Student) any { return s.Id })
+// {Id: 44, Name: "Ank", ClassId: 1}
 ```
 #### Sum
 Sum computes the sum of a sequence of numeric values.

@@ -77,6 +77,81 @@ func TestMin(t *testing.T) {
 	}
 }
 
+func TestMinBy(t *testing.T) {
+	type Student struct {
+		Id      int
+		Name    string
+		ClassId int
+	}
+	type args[T any] struct {
+		selector definition.SingleSelector[T]
+		comparer definition.Comparer[any]
+		source   []T
+		want     T
+	}
+	tests := []struct {
+		name string
+		args args[any]
+	}{
+		{
+			name: "MinBy",
+			args: args[any]{
+				selector: func(a any) any {
+					return a.(Student).Id
+				},
+				source: lingo.SliceTToAny([]Student{
+					{Id: 1, Name: "1", ClassId: 2},
+					{Id: 3, Name: "11", ClassId: 6},
+					{Id: -2, Name: "12", ClassId: 1},
+					{Id: 8, Name: "13", ClassId: 7},
+				}),
+				want: Student{Id: -2, Name: "12", ClassId: 1},
+			},
+		},
+		{
+			name: "MinBy",
+			args: args[any]{
+				selector: func(a any) any {
+					return a.(Student).Id
+				},
+				source: lingo.SliceTToAny([]Student{
+					{Id: 1, Name: "1", ClassId: 2},
+					{Id: 3, Name: "11", ClassId: 6},
+					{Id: 2, Name: "12", ClassId: 1},
+					{Id: 8, Name: "13", ClassId: 7},
+				}),
+				want: Student{Id: 1, Name: "1", ClassId: 2},
+			},
+		},
+		{
+			name: "MinBy",
+			args: args[any]{
+				selector: func(a any) any {
+					return a.(Student).Name
+				},
+				comparer: func(a1, a2 any) bool {
+					return len(a1.(string)) < len(a2.(string))
+				},
+				source: lingo.SliceTToAny([]Student{
+					{Id: 1, Name: "1", ClassId: 2},
+					{Id: 3, Name: "11", ClassId: 6},
+					{Id: -2, Name: "", ClassId: 1},
+					{Id: 8, Name: "13", ClassId: 7},
+				}),
+				want: Student{Id: -2, Name: "", ClassId: 1},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.args.source).MinBy(tt.args.selector, tt.args.comparer)
+			if got != tt.args.want {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.args.want)
+			}
+		})
+	}
+}
+
 func TestMax(t *testing.T) {
 	type Student struct {
 		Id      int
@@ -134,6 +209,81 @@ func TestMax(t *testing.T) {
 			got := lingo.AsEnumerable(tt.args.source).Max(tt.args.comparer)
 			if got != tt.args.want {
 				t.Errorf("Max() = %v, want %v", got, tt.args.want)
+			}
+		})
+	}
+}
+
+func TestMaxBy(t *testing.T) {
+	type Student struct {
+		Id      int
+		Name    string
+		ClassId int
+	}
+	type args[T any] struct {
+		selector definition.SingleSelector[T]
+		comparer definition.Comparer[T]
+		source   []T
+		want     T
+	}
+	tests := []struct {
+		name string
+		args args[any]
+	}{
+		{
+			name: "MaxBy",
+			args: args[any]{
+				selector: func(a any) any {
+					return a.(Student).Id
+				},
+				source: lingo.SliceTToAny([]Student{
+					{Id: 1, Name: "1", ClassId: 2},
+					{Id: 3, Name: "11", ClassId: 6},
+					{Id: 22, Name: "12", ClassId: 1},
+					{Id: 8, Name: "13", ClassId: 7},
+				}),
+				want: Student{Id: 22, Name: "12", ClassId: 1},
+			},
+		},
+		{
+			name: "MaxBy",
+			args: args[any]{
+				selector: func(a any) any {
+					return a.(Student).Id
+				},
+				source: lingo.SliceTToAny([]Student{
+					{Id: 10, Name: "1", ClassId: 2},
+					{Id: 3, Name: "11", ClassId: 6},
+					{Id: 2, Name: "12", ClassId: 1},
+					{Id: 8, Name: "13", ClassId: 7},
+				}),
+				want: Student{Id: 10, Name: "1", ClassId: 2},
+			},
+		},
+		{
+			name: "MaxBy",
+			args: args[any]{
+				selector: func(a any) any {
+					return a.(Student).Name
+				},
+				comparer: func(a1, a2 any) bool {
+					return len(a1.(string)) > len(a2.(string))
+				},
+				source: lingo.SliceTToAny([]Student{
+					{Id: 1, Name: "1", ClassId: 2},
+					{Id: 3, Name: "111", ClassId: 6},
+					{Id: -2, Name: "", ClassId: 1},
+					{Id: 8, Name: "13", ClassId: 7},
+				}),
+				want: Student{Id: 3, Name: "111", ClassId: 6},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.args.source).MaxBy(tt.args.selector, tt.args.comparer)
+			if got != tt.args.want {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.args.want)
 			}
 		})
 	}
