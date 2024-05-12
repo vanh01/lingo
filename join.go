@@ -19,19 +19,23 @@ func (e Enumerable[T]) Join(
 		getIter: func() <-chan any {
 			out := make(chan any)
 
+			inners := inner.ToSlice()
+			// use AsEnumerable to optimize performance, because inner can be a long chain of operators
+			innerKeys := AsEnumerable(inners).Select(innerKeySelector).ToSlice()
+			outers := e.ToSlice()
+			// same inner
+			outerKeys := AsEnumerable(outers).Select(outerKeySelector).ToSlice()
+
 			go func() {
 				defer close(out)
-				innerSlice := inner.ToSlice()
-				for value := range e.getIter() {
-					for _, i := range innerSlice {
-						outerKey := outerKeySelector(value)
-						innerKey := innerKeySelector(i)
+				for i := range outers {
+					for j := range inners {
 						if definition.IsEmptyOrNil(comparer) {
-							if outerKey == innerKey {
-								out <- resultSelector(value, i)
+							if outerKeys[i] == innerKeys[j] {
+								out <- resultSelector(outers[i], inners[j])
 							}
-						} else if comparer[0](outerKey, innerKey) {
-							out <- resultSelector(value, i)
+						} else if comparer[0](outerKeys[i], innerKeys[j]) {
+							out <- resultSelector(outers[i], inners[j])
 						}
 					}
 				}
