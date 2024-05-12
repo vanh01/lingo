@@ -75,22 +75,9 @@ func AsLookup[T any, K any, V any](
 						// must declare here to load data into memmory
 						temp := res[k]
 						out <- Grouping[K, V]{
-							Key:   k.(K),
-							Count: len(temp),
-							Enumerable: Enumerable[V]{
-								getIter: func() <-chan V {
-									outGrouping := make(chan V)
-
-									go func() {
-										defer close(outGrouping)
-										for i := range temp {
-											outGrouping <- temp[i]
-										}
-									}()
-
-									return outGrouping
-								},
-							},
+							Key:        k.(K),
+							Count:      len(temp),
+							Enumerable: AsEnumerable(temp),
 						}
 					}
 				}()
@@ -174,22 +161,9 @@ func AsPLookup[T any, K any, V any](
 						// must declare here to load data into memmory
 						temp := res[k]
 						out <- Grouping[K, V]{
-							Key:   k.(K),
-							Count: len(temp),
-							Enumerable: Enumerable[V]{
-								getIter: func() <-chan V {
-									outGrouping := make(chan V)
-
-									go func() {
-										defer close(outGrouping)
-										for i := range temp {
-											outGrouping <- temp[i]
-										}
-									}()
-
-									return outGrouping
-								},
-							},
+							Key:        k.(K),
+							Count:      len(temp),
+							Enumerable: AsEnumerable(temp),
 						}
 					}
 				}()
