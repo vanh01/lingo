@@ -62,11 +62,7 @@ func (p ParallelEnumerable[T]) GroupBy(
 ) ParallelEnumerable[any] {
 	return ParallelEnumerable[any]{
 		getIter: func() <-chan any {
-			type data struct {
-				key any
-				val any
-			}
-			mapdata := make(chan data)
+			mapdata := make(chan definition.KeyValData[any, any])
 
 			res := map[any][]any{}
 
@@ -94,9 +90,9 @@ func (p ParallelEnumerable[T]) GroupBy(
 							key = getHash(key)
 						}
 
-						mapdata <- data{
-							key: key,
-							val: <-ele,
+						mapdata <- definition.KeyValData[any, any]{
+							Key: key,
+							Val: <-ele,
 						}
 					}()
 				}
@@ -104,7 +100,7 @@ func (p ParallelEnumerable[T]) GroupBy(
 			}()
 
 			for d := range mapdata {
-				res[d.key] = append(res[d.key], d.val)
+				res[d.Key] = append(res[d.Key], d.Val)
 			}
 
 			out := make(chan any)

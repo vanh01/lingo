@@ -26,6 +26,11 @@ type GetHashCode[T any] func(T) any
 // Accumulator represents an accumulator function to be invoked on each element.
 type Accumulator[T any, K any] func(T, K) T
 
+type KeyValData[K, V any] struct {
+	Key K
+	Val V
+}
+
 func IsInt(i any) bool {
 	switch reflect.ValueOf(i).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:

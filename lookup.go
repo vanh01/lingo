@@ -99,11 +99,7 @@ func AsPLookup[T any, K any, V any](
 	elementSelector ...definition.SingleSelectorFull[T, V],
 ) Lookup[K, V] {
 	// group by section
-	type data struct {
-		key any
-		val V
-	}
-	mapdata := make(chan data)
+	mapdata := make(chan definition.KeyValData[any, V])
 
 	go func() {
 		defer close(mapdata)
@@ -133,9 +129,9 @@ func AsPLookup[T any, K any, V any](
 
 				key := keySelector(tempValue)
 
-				mapdata <- data{
-					key: key,
-					val: <-ele,
+				mapdata <- definition.KeyValData[any, V]{
+					Key: key,
+					Val: <-ele,
 				}
 			}()
 		}
@@ -144,7 +140,7 @@ func AsPLookup[T any, K any, V any](
 
 	res := map[any][]V{}
 	for d := range mapdata {
-		res[d.key] = append(res[d.key], d.val)
+		res[d.Key] = append(res[d.Key], d.Val)
 	}
 
 	return Lookup[K, V]{

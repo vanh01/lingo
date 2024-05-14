@@ -234,11 +234,7 @@ func (e Enumerable[T]) Aggregate(
 // On the other hand, we just use the first comparer
 func (p ParallelEnumerable[T]) MinBy(selector definition.SingleSelector[T], comparer ...definition.Comparer[any]) T {
 	var t T
-	type data struct {
-		key any
-		val T
-	}
-	keyVal := make(chan data)
+	keyVal := make(chan definition.KeyValData[any, T])
 	first := true
 
 	go func() {
@@ -250,9 +246,9 @@ func (p ParallelEnumerable[T]) MinBy(selector definition.SingleSelector[T], comp
 			temp := value
 			go func() {
 				defer wg.Done()
-				keyVal <- data{
-					key: selector(temp),
-					val: temp,
+				keyVal <- definition.KeyValData[any, T]{
+					Key: selector(temp),
+					Val: temp,
 				}
 			}()
 		}
@@ -262,18 +258,18 @@ func (p ParallelEnumerable[T]) MinBy(selector definition.SingleSelector[T], comp
 	var minKey any
 	for key := range keyVal {
 		if first {
-			t = key.val
-			minKey = key.key
+			t = key.Val
+			minKey = key.Key
 			first = false
 		}
 		if definition.IsEmptyOrNil(comparer) {
-			if definition.DefaultLessComparer(key.key, minKey) {
-				t = key.val
-				minKey = key.key
+			if definition.DefaultLessComparer(key.Key, minKey) {
+				t = key.Val
+				minKey = key.Key
 			}
-		} else if comparer[0](key.key, minKey) {
-			t = key.val
-			minKey = key.key
+		} else if comparer[0](key.Key, minKey) {
+			t = key.Val
+			minKey = key.Key
 		}
 	}
 	return t
@@ -288,11 +284,7 @@ func (p ParallelEnumerable[T]) MinBy(selector definition.SingleSelector[T], comp
 // On the other hand, we just use the first comparer
 func (p ParallelEnumerable[T]) MaxBy(selector definition.SingleSelector[T], comparer ...definition.Comparer[any]) T {
 	var t T
-	type data struct {
-		key any
-		val T
-	}
-	keyVal := make(chan data)
+	keyVal := make(chan definition.KeyValData[any, T])
 	first := true
 
 	go func() {
@@ -304,9 +296,9 @@ func (p ParallelEnumerable[T]) MaxBy(selector definition.SingleSelector[T], comp
 			temp := value
 			go func() {
 				defer wg.Done()
-				keyVal <- data{
-					key: selector(temp),
-					val: temp,
+				keyVal <- definition.KeyValData[any, T]{
+					Key: selector(temp),
+					Val: temp,
 				}
 			}()
 		}
@@ -316,18 +308,18 @@ func (p ParallelEnumerable[T]) MaxBy(selector definition.SingleSelector[T], comp
 	var maxKey any
 	for key := range keyVal {
 		if first {
-			t = key.val
-			maxKey = key.key
+			t = key.Val
+			maxKey = key.Key
 			first = false
 		}
 		if definition.IsEmptyOrNil(comparer) {
-			if definition.DefaultMoreComparer(key.key, maxKey) {
-				t = key.val
-				maxKey = key.key
+			if definition.DefaultMoreComparer(key.Key, maxKey) {
+				t = key.Val
+				maxKey = key.Key
 			}
-		} else if comparer[0](key.key, maxKey) {
-			t = key.val
-			maxKey = key.key
+		} else if comparer[0](key.Key, maxKey) {
+			t = key.Val
+			maxKey = key.Key
 		}
 	}
 	return t
