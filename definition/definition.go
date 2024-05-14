@@ -1,4 +1,4 @@
-package lingo
+package definition
 
 import (
 	"reflect"
@@ -26,7 +26,7 @@ type GetHashCode[T any] func(T) any
 // Accumulator represents an accumulator function to be invoked on each element.
 type Accumulator[T any, K any] func(T, K) T
 
-func isInt(i any) bool {
+func IsInt(i any) bool {
 	switch reflect.ValueOf(i).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return true
@@ -34,7 +34,7 @@ func isInt(i any) bool {
 	return false
 }
 
-func isUint(i any) bool {
+func IsUint(i any) bool {
 	switch reflect.ValueOf(i).Kind() {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return true
@@ -42,7 +42,7 @@ func isUint(i any) bool {
 	return false
 }
 
-func isFloat(i any) bool {
+func IsFloat(i any) bool {
 	switch reflect.ValueOf(i).Kind() {
 	case reflect.Float32, reflect.Float64:
 		return true
@@ -50,8 +50,8 @@ func isFloat(i any) bool {
 	return false
 }
 
-func isNumber(i any) bool {
-	return isInt(i) || isUint(i) || isFloat(i)
+func IsNumber(i any) bool {
+	return IsInt(i) || IsUint(i) || IsFloat(i)
 }
 
 // convert number type to int
@@ -200,11 +200,11 @@ func defaultConvertToInt[T any](value any) T {
 	var t T
 
 	switch {
-	case isFloat(value):
+	case IsFloat(value):
 		t = floatToActualInt[T](value)
-	case isUint(value):
+	case IsUint(value):
 		t = uintToActualInt[T](value)
-	case isInt(value):
+	case IsInt(value):
 		t = intToActualInt[T](value)
 	}
 	return t
@@ -215,11 +215,11 @@ func defaultConvertToUint[T any](value any) T {
 	var t T
 
 	switch {
-	case isFloat(value):
+	case IsFloat(value):
 		t = floatToActualUint[T](value)
-	case isUint(value):
+	case IsUint(value):
 		t = uintToActualUint[T](value)
-	case isInt(value):
+	case IsInt(value):
 		t = intToActualUint[T](value)
 	}
 	return t
@@ -230,32 +230,32 @@ func defaultConvertToFloat[T any](value any) T {
 	var t T
 
 	switch {
-	case isInt(value):
+	case IsInt(value):
 		t = intToActualFloat[T](value)
-	case isUint(value):
+	case IsUint(value):
 		t = uintToActualFloat[T](value)
-	case isFloat(value):
+	case IsFloat(value):
 		t = floatToActualFloat[T](value)
 	}
 	return t
 }
 
-// defaultConvertToNumber
-func defaultConvertToNumber[T any](value any) T {
+// DefaultConvertToNumber
+func DefaultConvertToNumber[T any](value any) T {
 	var t T
 	switch {
-	case isInt(t):
+	case IsInt(t):
 		t = defaultConvertToInt[T](value)
-	case isUint(t):
+	case IsUint(t):
 		t = defaultConvertToUint[T](value)
-	case isFloat(t):
+	case IsFloat(t):
 		t = defaultConvertToFloat[T](value)
 	}
 	return t
 }
 
-// defaultLessComparer is the default compare when the first one is smaller than the second one
-func defaultLessComparer[T any](t1, t2 T) bool {
+// DefaultLessComparer is the default compare when the first one is smaller than the second one
+func DefaultLessComparer[T any](t1, t2 T) bool {
 	switch reflect.ValueOf(t1).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return reflect.ValueOf(t1).Int() < reflect.ValueOf(t2).Int()
@@ -276,8 +276,8 @@ func defaultLessComparer[T any](t1, t2 T) bool {
 	return false
 }
 
-// defaultMoreComparer is the default compare when the first one is greater than the second one
-func defaultMoreComparer[T any](t1, t2 T) bool {
+// DefaultMoreComparer is the default compare when the first one is greater than the second one
+func DefaultMoreComparer[T any](t1, t2 T) bool {
 	switch reflect.ValueOf(t1).Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return reflect.ValueOf(t1).Int() > reflect.ValueOf(t2).Int()
@@ -298,7 +298,7 @@ func defaultMoreComparer[T any](t1, t2 T) bool {
 	return false
 }
 
-func isEmptyOrNil[T any](t []T) bool {
+func IsEmptyOrNil[T any](t []T) bool {
 	if reflect.ValueOf(t).IsNil() {
 		return true
 	}

@@ -2,12 +2,14 @@ package lingo
 
 import (
 	"sort"
+
+	"github.com/vanh01/lingo/definition"
 )
 
 type sorter[T any, K any] struct {
 	origin   []T
 	keys     []K
-	comparer Comparer[K]
+	comparer definition.Comparer[K]
 }
 
 func (s sorter[T, K]) Len() int {
@@ -23,15 +25,15 @@ func (s sorter[T, K]) Less(i, j int) bool {
 	return s.comparer(s.keys[i], s.keys[j])
 }
 
-func NewSorter[T any, K any](origin []T, source []K, comparer ...Comparer[K]) sorter[T, K] {
+func NewSorter[T any, K any](origin []T, source []K, comparer ...definition.Comparer[K]) sorter[T, K] {
 	res := sorter[T, K]{
 		origin: origin,
 		keys:   source,
 	}
-	var comp Comparer[K]
-	if isEmptyOrNil(comparer) {
+	var comp definition.Comparer[K]
+	if definition.IsEmptyOrNil(comparer) {
 		comp = func(t1, t2 K) bool {
-			return defaultLessComparer(t1, t2)
+			return definition.DefaultLessComparer(t1, t2)
 		}
 	} else {
 		comp = comparer[0]
@@ -45,7 +47,7 @@ func NewSorter[T any, K any](origin []T, source []K, comparer ...Comparer[K]) so
 //
 // In this method, comparer is returns whether left is smaller than right or not.
 // If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
-func (e Enumerable[T]) OrderBy(selector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
+func (e Enumerable[T]) OrderBy(selector definition.SingleSelector[T], comparer ...definition.Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)
@@ -70,7 +72,7 @@ func (e Enumerable[T]) OrderBy(selector SingleSelector[T], comparer ...Comparer[
 //
 // In this method, comparer is returns whether left is smaller than right or not.
 // If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
-func (e Enumerable[T]) OrderByDescending(selector SingleSelector[T], comparer ...Comparer[any]) Enumerable[T] {
+func (e Enumerable[T]) OrderByDescending(selector definition.SingleSelector[T], comparer ...definition.Comparer[any]) Enumerable[T] {
 	return Enumerable[T]{
 		getIter: func() <-chan T {
 			out := make(chan T)

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	lingo "github.com/vanh01/lingo"
+	"github.com/vanh01/lingo/definition"
 )
 
 func TestDistinct(t *testing.T) {
@@ -58,8 +59,8 @@ func TestDistinctBy(t *testing.T) {
 		Level int
 	}
 	type args struct {
-		keySelector lingo.SingleSelector[Student]
-		comparer    lingo.Comparer[any]
+		keySelector definition.SingleSelector[Student]
+		comparer    definition.Comparer[any]
 	}
 	tests := []struct {
 		name   string
@@ -216,8 +217,8 @@ func TestExceptBy(t *testing.T) {
 	}
 	type args struct {
 		second      []any
-		keySelector lingo.SingleSelector[Student]
-		comparer    lingo.Comparer[any]
+		keySelector definition.SingleSelector[Student]
+		comparer    definition.Comparer[any]
 	}
 	tests := []struct {
 		name   string
@@ -369,8 +370,8 @@ func TestIntersectBy(t *testing.T) {
 	}
 	type args struct {
 		second      []any
-		keySelector lingo.SingleSelector[Student]
-		comparer    lingo.Comparer[any]
+		keySelector definition.SingleSelector[Student]
+		comparer    definition.Comparer[any]
 	}
 	tests := []struct {
 		name   string
@@ -534,8 +535,8 @@ func TestUnionBy(t *testing.T) {
 	}
 	type args struct {
 		second      []Student
-		keySelector lingo.SingleSelector[Student]
-		comparer    lingo.Comparer[any]
+		keySelector definition.SingleSelector[Student]
+		comparer    definition.Comparer[any]
 	}
 	tests := []struct {
 		name   string

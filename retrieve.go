@@ -1,5 +1,7 @@
 package lingo
 
+import "github.com/vanh01/lingo/definition"
+
 // FirstOrNil returns the first element of a sequence (with condition if any),
 // or a nil value if no element is found
 //
@@ -8,7 +10,7 @@ func (e Enumerable[T]) FirstOrNil(predicate ...Predicate[T]) T {
 	var t T
 	first := true
 	for value := range e.getIter() {
-		if !isEmptyOrNil(predicate) {
+		if !definition.IsEmptyOrNil(predicate) {
 			if !predicate[0](value) {
 				continue
 			}
@@ -29,7 +31,7 @@ func (e Enumerable[T]) FirstOrDefault(defaultValue T, predicate ...Predicate[T])
 	var t T = defaultValue
 	first := true
 	for value := range e.getIter() {
-		if !isEmptyOrNil(predicate) {
+		if !definition.IsEmptyOrNil(predicate) {
 			if !predicate[0](value) {
 				continue
 			}
@@ -49,7 +51,7 @@ func (e Enumerable[T]) FirstOrDefault(defaultValue T, predicate ...Predicate[T])
 func (e Enumerable[T]) LastOrNil(predicate ...Predicate[T]) T {
 	var t T
 	for value := range e.getIter() {
-		if !isEmptyOrNil(predicate) {
+		if !definition.IsEmptyOrNil(predicate) {
 			if !predicate[0](value) {
 				continue
 			}
@@ -66,7 +68,7 @@ func (e Enumerable[T]) LastOrNil(predicate ...Predicate[T]) T {
 func (e Enumerable[T]) LastOrDefault(defaultValue T, predicate ...Predicate[T]) T {
 	var t T = defaultValue
 	for value := range e.getIter() {
-		if !isEmptyOrNil(predicate) {
+		if !definition.IsEmptyOrNil(predicate) {
 			if !predicate[0](value) {
 				continue
 			}

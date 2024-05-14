@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	lingo "github.com/vanh01/lingo"
+	"github.com/vanh01/lingo/definition"
 )
 
 func TestJoin(t *testing.T) {
@@ -26,10 +27,10 @@ func TestJoin(t *testing.T) {
 	}
 	type args struct {
 		inner            []any
-		innerKeySelector lingo.SingleSelector[any]
-		outerKeySelector lingo.SingleSelector[Student]
-		resultSelector   lingo.CombinationSelector[Student, any]
-		comparer         lingo.Comparer[any]
+		innerKeySelector definition.SingleSelector[any]
+		outerKeySelector definition.SingleSelector[Student]
+		resultSelector   definition.CombinationSelector[Student, any]
+		comparer         definition.Comparer[any]
 	}
 	tests := []struct {
 		name   string

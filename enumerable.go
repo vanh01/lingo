@@ -3,6 +3,8 @@ package lingo
 import (
 	"reflect"
 	"unsafe"
+
+	"github.com/vanh01/lingo/definition"
 )
 
 type Enumerable[T any] struct {
@@ -12,6 +14,24 @@ type Enumerable[T any] struct {
 // GetIter returns an unbuffered channel of T that iterates through a collection.
 func (e Enumerable[T]) GetIter() <-chan T {
 	return e.getIter()
+}
+
+// AsEnumerable creates a new Enumerable from ParallelEnumerable
+func (p ParallelEnumerable[T]) AsEnumerable() Enumerable[T] {
+	return Enumerable[T]{
+		getIter: func() <-chan T {
+			ch := make(chan T)
+
+			go func() {
+				defer close(ch)
+				for value := range p.getIter() {
+					ch <- value
+				}
+			}()
+
+			return ch
+		},
+	}
 }
 
 // AsEnumerable creates a new Enumerable
@@ -45,8 +65,8 @@ func AsEnumerableTFromAny[T any](e Enumerable[any]) Enumerable[T] {
 				var temp T
 				for value := range e.getIter() {
 					switch {
-					case isNumber(temp):
-						out <- defaultConvertToNumber[T](value)
+					case definition.IsNumber(temp):
+						out <- definition.DefaultConvertToNumber[T](value)
 					case reflect.TypeOf(temp) == reflect.TypeOf(value):
 						out <- value.(T)
 					default:
@@ -92,8 +112,8 @@ func AsEnumerableTFromSliceAny[T any](a []any) Enumerable[T] {
 				var temp T
 				for _, value := range a {
 					switch {
-					case isNumber(temp):
-						out <- defaultConvertToNumber[T](value)
+					case definition.IsNumber(temp):
+						out <- definition.DefaultConvertToNumber[T](value)
 					case reflect.TypeOf(temp) == reflect.TypeOf(value):
 						out <- value.(T)
 					default:
