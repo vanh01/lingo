@@ -197,3 +197,31 @@ func TestGetIter(t *testing.T) {
 		})
 	}
 }
+
+func TestAsEnumerableFromChannel(t *testing.T) {
+	type args struct {
+	}
+	tests := []struct {
+		name   string
+		source []int
+		args   args
+		want   []int
+	}{
+		{
+			name:   "AsEnumerableFromChannel",
+			source: []int{1, 2, 3, 4, 5, 6},
+			want:   []int{1, 2, 3, 4, 5, 6},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := 0
+			for _, value := range lingo.AsEnumerableFromChannel(lingo.AsEnumerable(tt.source).GetIter()).ToSlice() {
+				if value != tt.want[i] {
+					t.Errorf("%s() = %v, want %v", tt.name, value, tt.want[i])
+				}
+				i++
+			}
+		})
+	}
+}
