@@ -52,6 +52,29 @@ func AsEnumerable[T any](t []T) Enumerable[T] {
 	}
 }
 
+// AsEnumerableFromChannel creates a new Enumerable from a receive-only channel
+func AsEnumerableFromChannel[T any](c <-chan T) Enumerable[T] {
+	var t []T
+	for value := range c {
+		t = append(t, value)
+	}
+
+	return Enumerable[T]{
+		getIter: func() <-chan T {
+			ch := make(chan T)
+
+			go func() {
+				defer close(ch)
+				for _, value := range t {
+					ch <- value
+				}
+			}()
+
+			return ch
+		},
+	}
+}
+
 // AsEnumerableTFromAny creates a new Enumerable of specific type from Enumerable of any
 //
 // This will be useful after using projection operations

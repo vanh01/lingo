@@ -6,6 +6,13 @@ Example:
 ```go
 enumerable := lingo.AsEnumerable([]int{1, 2, 3})
 ```
+#### AsEnumerableFromChannel
+AsEnumerableFromChannel creates a new Enumerable from a receive-only channel
+
+Example:
+```go
+enumerable := lingo.AsEnumerableFromChannel(lingo.AsEnumerable([]int{1, 2, 3}).GetIter())
+```
 #### AsEnumerableTFromAny
 AsEnumerableTFromAny creates a new Enumerable of specific type from Enumerable of any type, this method will be useful after using projection operations.
 
