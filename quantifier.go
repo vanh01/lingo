@@ -63,7 +63,7 @@ func (p ParallelEnumerable[T]) All(predicate Predicate[T]) bool {
 			temp := value
 			go func() {
 				defer wg.Done()
-				res <- predicate(temp)
+				res <- predicate(temp.val)
 			}()
 		}
 		wg.Wait()
@@ -90,7 +90,7 @@ func (p ParallelEnumerable[T]) Any(predicate Predicate[T]) bool {
 			temp := value
 			go func() {
 				defer wg.Done()
-				res <- predicate(temp)
+				res <- predicate(temp.val)
 			}()
 		}
 		wg.Wait()
@@ -123,11 +123,11 @@ func (p ParallelEnumerable[T]) Contains(value T, comparer ...definition.Comparer
 			go func() {
 				defer wg.Done()
 				if definition.IsEmptyOrNil(comparer) {
-					if reflect.ValueOf(temp).Interface() == reflect.ValueOf(value).Interface() {
+					if reflect.ValueOf(temp.val).Interface() == reflect.ValueOf(value).Interface() {
 						res <- true
 					}
 				} else {
-					if comparer[0](temp, value) {
+					if comparer[0](temp.val, value) {
 						res <- true
 					}
 				}

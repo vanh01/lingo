@@ -28,8 +28,10 @@ func (e Enumerable[T]) Where(predicate Predicate[T]) Enumerable[T] {
 // Where filters in parallel a sequence of values based on a predicate.
 func (p ParallelEnumerable[T]) Where(predicate Predicate[T]) ParallelEnumerable[T] {
 	return ParallelEnumerable[T]{
-		getIter: func() <-chan T {
-			output := make(chan T)
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[T] {
+			output := make(chan odata[T])
 
 			go func() {
 				defer close(output)
@@ -38,7 +40,7 @@ func (p ParallelEnumerable[T]) Where(predicate Predicate[T]) ParallelEnumerable[
 					wg.Add(1)
 					temp := value
 					go func() {
-						if predicate(temp) {
+						if predicate(temp.val) {
 							output <- temp
 						}
 						wg.Done()
