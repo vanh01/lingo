@@ -81,8 +81,10 @@ func (e Enumerable[T]) Zip(second Enumerable[any], resultSelector ...definition.
 // Select projects in parallel each element of a sequence into a new form.
 func (p ParallelEnumerable[T]) Select(selector definition.SingleSelector[T]) ParallelEnumerable[any] {
 	return ParallelEnumerable[any]{
-		getIter: func() <-chan any {
-			out := make(chan any)
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[any] {
+			out := make(chan odata[any])
 
 			go func() {
 				defer close(out)
@@ -91,8 +93,11 @@ func (p ParallelEnumerable[T]) Select(selector definition.SingleSelector[T]) Par
 					wg.Add(1)
 					temp := value
 					go func() {
-						var t any = selector(temp)
-						out <- t
+						var t any = selector(temp.val)
+						out <- odata[any]{
+							no:  temp.no,
+							val: t,
+						}
 						wg.Done()
 					}()
 				}
@@ -107,8 +112,10 @@ func (p ParallelEnumerable[T]) Select(selector definition.SingleSelector[T]) Par
 // SelectMany projects in parallel each element of a sequence to an []T and flattens the resulting sequences into one sequence.
 func (p ParallelEnumerable[T]) SelectMany(selector definition.SingleSelector[T]) ParallelEnumerable[any] {
 	return ParallelEnumerable[any]{
-		getIter: func() <-chan any {
-			out := make(chan any)
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[any] {
+			out := make(chan odata[any])
 
 			go func() {
 				defer close(out)
@@ -119,12 +126,15 @@ func (p ParallelEnumerable[T]) SelectMany(selector definition.SingleSelector[T])
 					temp := value
 					go func() {
 						defer wg.Done()
-						res := selector(temp)
+						res := selector(temp.val)
 
 						resValue := reflect.ValueOf(res)
 						if resValue.Kind() == reflect.Slice {
 							for i := 0; i < resValue.Len(); i++ {
-								out <- resValue.Index(i).Interface()
+								out <- odata[any]{
+									no:  temp.no,
+									val: resValue.Index(i).Interface(),
+								}
 							}
 						}
 					}()
@@ -143,8 +153,10 @@ func (p ParallelEnumerable[T]) SelectMany(selector definition.SingleSelector[T])
 // On the other hand, we just use the first resultSelector
 func (p ParallelEnumerable[T]) Zip(second ParallelEnumerable[any], resultSelector ...definition.CombinationSelector[T, any]) ParallelEnumerable[any] {
 	return ParallelEnumerable[any]{
-		getIter: func() <-chan any {
-			out := make(chan any)
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[any] {
+			out := make(chan odata[any])
 
 			go func() {
 				defer close(out)
@@ -159,10 +171,17 @@ func (p ParallelEnumerable[T]) Zip(second ParallelEnumerable[any], resultSelecto
 					go func() {
 						defer wg.Done()
 						if definition.IsEmptyOrNil(resultSelector) {
-							out <- []any{valueTemp, secondTemp}
+							out <- odata[any]{
+								no:  valueTemp.no,
+								val: []any{valueTemp.val, secondTemp.val},
+							}
 						} else {
-							valueTemp := resultSelector[0](valueTemp, secondTemp)
-							out <- valueTemp
+							no := valueTemp.no
+							valueTemp := resultSelector[0](valueTemp.val, secondTemp.val)
+							out <- odata[any]{
+								no:  no,
+								val: valueTemp,
+							}
 						}
 					}()
 				}

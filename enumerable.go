@@ -22,10 +22,14 @@ func (p ParallelEnumerable[T]) AsEnumerable() Enumerable[T] {
 		getIter: func() <-chan T {
 			ch := make(chan T)
 
+			temp := p
+			if p.ordered {
+				temp = temp.order()
+			}
 			go func() {
 				defer close(ch)
-				for value := range p.getIter() {
-					ch <- value
+				for value := range temp.getIter() {
+					ch <- value.val
 				}
 			}()
 

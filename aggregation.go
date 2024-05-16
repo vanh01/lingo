@@ -247,8 +247,8 @@ func (p ParallelEnumerable[T]) MinBy(selector definition.SingleSelector[T], comp
 			go func() {
 				defer wg.Done()
 				keyVal <- definition.KeyValData[any, T]{
-					Key: selector(temp),
-					Val: temp,
+					Key: selector(temp.val),
+					Val: temp.val,
 				}
 			}()
 		}
@@ -297,8 +297,8 @@ func (p ParallelEnumerable[T]) MaxBy(selector definition.SingleSelector[T], comp
 			go func() {
 				defer wg.Done()
 				keyVal <- definition.KeyValData[any, T]{
-					Key: selector(temp),
-					Val: temp,
+					Key: selector(temp.val),
+					Val: temp.val,
 				}
 			}()
 		}
@@ -343,7 +343,7 @@ func (p ParallelEnumerable[T]) Sum(selector ...definition.SingleSelector[T]) any
 				if definition.IsEmptyOrNil(selector) {
 					out <- temp
 				} else {
-					out <- selector[0](temp)
+					out <- selector[0](temp.val)
 				}
 			}()
 		}
@@ -395,7 +395,7 @@ func (p ParallelEnumerable[T]) Average(selector ...definition.SingleSelector[T])
 				if definition.IsEmptyOrNil(selector) {
 					out <- temp
 				} else {
-					out <- selector[0](temp)
+					out <- selector[0](temp.val)
 				}
 			}()
 		}

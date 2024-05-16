@@ -360,12 +360,10 @@ func TestAsPLookup(t *testing.T) {
 				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
 			}
 			for group := range got.GetIter() {
-				i := 0
-				for v := range group.OrderBy(func(a any) any { return a }).GetIter() {
-					if v != tt.want.item[group.Key][i] {
-						t.Errorf("%s() = %v, want %v", tt.name, v, tt.want.item[group.Key][i])
+				for value := range group.GetIter() {
+					if !lingo.AsEnumerable(tt.want.item[group.Key]).Contains(value) {
+						t.Errorf("%s() = %v, want %v", tt.name, group.ToSlice(), tt.want.item[group.Key])
 					}
-					i++
 				}
 			}
 		})

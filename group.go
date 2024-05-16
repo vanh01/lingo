@@ -61,10 +61,8 @@ func (p ParallelEnumerable[T]) GroupBy(
 	getHash definition.GetHashCode[any],
 ) ParallelEnumerable[any] {
 	return ParallelEnumerable[any]{
-		getIter: func() <-chan any {
-			mapdata := make(chan definition.KeyValData[any, any])
-
-			res := map[any][]any{}
+		getIter: func() <-chan odata[any] {
+			mapdata := make(chan odata[definition.KeyValData[any, any]])
 
 			go func() {
 				defer close(mapdata)
@@ -80,30 +78,38 @@ func (p ParallelEnumerable[T]) GroupBy(
 							defer close(ele)
 							var element any = temp
 							if elementSelector != nil {
-								element = elementSelector(temp)
+								element = elementSelector(temp.val)
 							}
 							ele <- element
 						}()
 
-						key := keySelector(temp)
+						key := keySelector(temp.val)
 						if getHash != nil {
 							key = getHash(key)
 						}
 
-						mapdata <- definition.KeyValData[any, any]{
-							Key: key,
-							Val: <-ele,
+						mapdata <- odata[definition.KeyValData[any, any]]{
+							no: temp.no,
+							val: definition.KeyValData[any, any]{
+								Key: key,
+								Val: <-ele,
+							},
 						}
 					}()
 				}
 				wg.Wait()
 			}()
 
+			res := map[any][]any{}
+			resNo := map[any]int{}
 			for d := range mapdata {
-				res[d.Key] = append(res[d.Key], d.Val)
+				res[d.val.Key] = append(res[d.val.Key], d.val.Val)
+				if _, ex := resNo[d.val.Key]; !ex {
+					resNo[d.val.Key] = d.no
+				}
 			}
 
-			out := make(chan any)
+			out := make(chan odata[any])
 
 			go func() {
 				defer close(out)
@@ -113,7 +119,10 @@ func (p ParallelEnumerable[T]) GroupBy(
 					k1, v1 := k, v
 					go func() {
 						defer wg.Done()
-						out <- resultSelector(k1, v1)
+						out <- odata[any]{
+							no:  resNo[k1],
+							val: resultSelector(k1, v1),
+						}
 					}()
 				}
 				wg.Wait()

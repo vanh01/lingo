@@ -115,11 +115,11 @@ func AsPLookup[T any, K any, V any](
 					defer close(ele)
 					var element V
 					if !definition.IsEmptyOrNil(elementSelector) {
-						element = elementSelector[0](tempValue)
+						element = elementSelector[0](tempValue.val)
 					} else {
-						temp, ok := any(tempValue).(V)
+						temp, ok := any(tempValue.val).(V)
 						if !ok {
-							element = *(*V)(unsafe.Pointer(&tempValue))
+							element = *(*V)(unsafe.Pointer(&tempValue.val))
 						} else {
 							element = temp
 						}
@@ -127,7 +127,7 @@ func AsPLookup[T any, K any, V any](
 					ele <- element
 				}()
 
-				key := keySelector(tempValue)
+				key := keySelector(tempValue.val)
 
 				mapdata <- definition.KeyValData[any, V]{
 					Key: key,
