@@ -621,3 +621,257 @@ func TestUnionBy(t *testing.T) {
 		})
 	}
 }
+
+func TestPDistinct(t *testing.T) {
+	type Student struct {
+		Id    int
+		Name  string
+		Level int
+	}
+	type args struct {
+	}
+	tests := []struct {
+		name   string
+		source []Student
+		args   args
+		want   []Student
+	}{
+		{
+			name: "Distinct",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.source).AsParallel().AsOrdered().Distinct().ToSlice()
+			if len(got) != len(tt.want) {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+			}
+			for i := range tt.want {
+				if got[i] != tt.want[i] {
+					t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestPExcept(t *testing.T) {
+	type Student struct {
+		Id    int
+		Name  string
+		Level int
+	}
+	type args struct {
+		second []Student
+	}
+	tests := []struct {
+		name   string
+		source []Student
+		args   args
+		want   []Student
+	}{
+		{
+			name: "Except",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{second: []Student{
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			}},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+			},
+		},
+		{
+			name: "Except",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{second: []Student{
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			}},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.source).AsParallel().AsOrdered().Except(lingo.AsEnumerable(tt.args.second).AsParallel().AsOrdered()).ToSlice()
+			if len(got) != len(tt.want) {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+			}
+			for i := range tt.want {
+				if got[i] != tt.want[i] {
+					t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestPIntersect(t *testing.T) {
+	type Student struct {
+		Id    int
+		Name  string
+		Level int
+	}
+	type args struct {
+		second []Student
+	}
+	tests := []struct {
+		name   string
+		source []Student
+		args   args
+		want   []Student
+	}{
+		{
+			name: "Intersect",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{second: []Student{
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 4, Name: "An", Level: 2},
+				{Id: 5, Name: "Anh", Level: 2},
+			}},
+			want: []Student{
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+		},
+		{
+			name: "Intersect",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{second: []Student{
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			}},
+			want: []Student{
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsEnumerable(tt.source).AsParallel().AsOrdered().Intersect(lingo.AsParallelEnumerable(tt.args.second).AsOrdered()).ToSlice()
+			if len(got) != len(tt.want) {
+				t.Errorf("Intersect() = %v, want %v", got, tt.want)
+			}
+			for i := range tt.want {
+				if got[i] != tt.want[i] {
+					t.Errorf("Intersect() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestPUnion(t *testing.T) {
+	type Student struct {
+		Id    int
+		Name  string
+		Level int
+	}
+	type args struct {
+		second []Student
+	}
+	tests := []struct {
+		name   string
+		source []Student
+		args   args
+		want   []Student
+	}{
+		{
+			name: "Union",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{second: []Student{
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 4, Name: "An", Level: 2},
+				{Id: 5, Name: "Anh", Level: 2},
+			}},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 4, Name: "An", Level: 2},
+				{Id: 5, Name: "Anh", Level: 2},
+			},
+		},
+		{
+			name: "Union",
+			source: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+			args: args{second: []Student{
+				{Id: 3, Name: "Anh", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			}},
+			want: []Student{
+				{Id: 1, Name: "Nam", Level: 1},
+				{Id: 2, Name: "An", Level: 2},
+				{Id: 3, Name: "Anh", Level: 2},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := lingo.AsParallelEnumerable(tt.source).AsOrdered().Union(lingo.AsParallelEnumerable(tt.args.second).AsOrdered()).ToSlice()
+			if len(got) != len(tt.want) {
+				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+			}
+			for i := range tt.want {
+				if got[i] != tt.want[i] {
+					t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
+				}
+			}
+		})
+	}
+}

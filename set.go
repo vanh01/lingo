@@ -1,6 +1,10 @@
 package lingo
 
-import "github.com/vanh01/lingo/definition"
+import (
+	"sync"
+
+	"github.com/vanh01/lingo/definition"
+)
 
 // Distinct removes duplicate values from a collection.
 func (e Enumerable[T]) Distinct() Enumerable[T] {
@@ -326,6 +330,204 @@ func (e Enumerable[T]) UnionBy(second Enumerable[T], keySelector definition.Sing
 						setKey = append(setKey, key)
 					}
 				}
+			}()
+
+			return out
+		},
+	}
+}
+
+// ParallelEnumerable
+
+// Distinct returns distinct elements from a parallel sequence by using the default equality comparer to compare values.
+func (p ParallelEnumerable[T]) Distinct() ParallelEnumerable[T] {
+	return ParallelEnumerable[T]{
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[T] {
+			out := make(chan odata[T])
+
+			temp := p
+			if p.ordered {
+				temp = temp.order()
+			}
+
+			go func() {
+				defer close(out)
+				var m sync.Map
+				var wg sync.WaitGroup
+				for value := range temp.getIter() {
+					wg.Add(1)
+					temp := value
+					go func() {
+						defer wg.Done()
+						if _, ex := m.Load(temp.val); !ex {
+							m.Store(temp.val, struct{}{})
+							out <- temp
+						}
+					}()
+				}
+				wg.Wait()
+			}()
+
+			return out
+		},
+	}
+}
+
+// Except returns the set difference, which means the elements of one collection
+// that don't appear in a second collection.
+func (p ParallelEnumerable[T]) Except(second ParallelEnumerable[T]) ParallelEnumerable[T] {
+	return ParallelEnumerable[T]{
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[T] {
+			out := make(chan odata[T])
+
+			temp := p
+			if p.ordered {
+				temp = temp.order()
+			}
+
+			go func() {
+				defer close(out)
+
+				tempSecond := second
+				if second.ordered {
+					tempSecond = second.order()
+				}
+				secondMap := tempSecond.ToMap(func(t T) any { return t }, func(t T) any {
+					return struct{}{}
+				})
+
+				var m sync.Map
+				for k, v := range secondMap {
+					m.Store(k, v)
+				}
+
+				var wg sync.WaitGroup
+				for value := range temp.getIter() {
+					wg.Add(1)
+					temp := value
+					go func() {
+						defer wg.Done()
+						_, ex := m.Load(temp.val)
+						if !ex {
+							out <- temp
+							m.Store(temp.val, struct{}{})
+						}
+					}()
+				}
+				wg.Wait()
+			}()
+
+			return out
+		},
+	}
+}
+
+// Intersect returns the set intersection, which means elements
+// that appear in each of two collections.
+func (p ParallelEnumerable[T]) Intersect(second ParallelEnumerable[T]) ParallelEnumerable[T] {
+	return ParallelEnumerable[T]{
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[T] {
+			out := make(chan odata[T])
+
+			temp := p
+			if p.ordered {
+				temp = temp.order()
+			}
+
+			go func() {
+				defer close(out)
+				var m sync.Map
+				tempSecond := second
+				if second.ordered {
+					tempSecond = second.order()
+				}
+				for value := range tempSecond.getIter() {
+					m.Store(value.val, true)
+				}
+				var wg sync.WaitGroup
+				for value := range temp.getIter() {
+					wg.Add(1)
+					temp := value
+					go func() {
+						defer wg.Done()
+						if v, ex := m.Load(temp.val); ex && v.(bool) {
+							m.Store(temp.val, false)
+							out <- temp
+						}
+					}()
+				}
+				wg.Wait()
+			}()
+
+			return out
+		},
+	}
+}
+
+// Union returns the set union, which means unique elements that
+// appear in either of two collections.
+func (p ParallelEnumerable[T]) Union(second ParallelEnumerable[T]) ParallelEnumerable[T] {
+	return ParallelEnumerable[T]{
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[T] {
+			out := make(chan odata[T])
+
+			temp := p
+			if p.ordered {
+				temp = temp.order()
+			}
+
+			go func() {
+				defer close(out)
+				var m sync.Map
+				maxNo := make(chan int, 1)
+				maxNo <- -1
+				var wg sync.WaitGroup
+				for value := range temp.getIter() {
+					wg.Add(1)
+					temp := value
+					go func() {
+						defer wg.Done()
+						if _, ex := m.Load(temp.val); !ex {
+							m.Store(temp.val, struct{}{})
+							out <- temp
+							tempMaxNo := <-maxNo
+							if tempMaxNo < temp.no {
+								tempMaxNo = temp.no
+							}
+							maxNo <- tempMaxNo
+						}
+					}()
+				}
+				wg.Wait()
+
+				startNo := <-maxNo + 1
+
+				tempSecond := second
+				if second.ordered {
+					tempSecond = second.order()
+				}
+				var wg1 sync.WaitGroup
+				for value := range tempSecond.getIter() {
+					wg1.Add(1)
+					temp := value
+					go func() {
+						defer wg1.Done()
+						if _, ex := m.Load(temp.val); !ex {
+							m.Store(temp.val, struct{}{})
+							temp.no = temp.no + startNo
+							out <- temp
+						}
+					}()
+				}
+				wg1.Wait()
 			}()
 
 			return out
