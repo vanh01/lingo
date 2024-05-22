@@ -1,5 +1,7 @@
 package lingo
 
+import "sync"
+
 type odata[T any] struct {
 	no  int
 	val T
@@ -89,6 +91,55 @@ func AsParallelEnumerable[T any](t []T) ParallelEnumerable[T] {
 			}()
 
 			return ch
+		},
+	}
+}
+
+// Concat concatenates two parallel sequences.
+func (p ParallelEnumerable[T]) Concat(second ParallelEnumerable[T]) ParallelEnumerable[T] {
+	return ParallelEnumerable[T]{
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[T] {
+			out := make(chan odata[T])
+
+			go func() {
+				defer close(out)
+
+				maxNo := make(chan int, 1)
+				maxNo <- -1
+				var wg sync.WaitGroup
+				for value := range p.getIter() {
+					wg.Add(1)
+					temp := value
+					go func() {
+						defer wg.Done()
+						tempMaxNo := <-maxNo
+						if tempMaxNo < temp.no {
+							tempMaxNo = temp.no
+						}
+						maxNo <- tempMaxNo
+						out <- temp
+					}()
+				}
+				wg.Wait()
+
+				startNo := <-maxNo + 1
+
+				var wg1 sync.WaitGroup
+				for value := range second.getIter() {
+					wg1.Add(1)
+					temp := value
+					temp.no = temp.no + startNo
+					go func() {
+						defer wg1.Done()
+						out <- temp
+					}()
+				}
+				wg1.Wait()
+			}()
+
+			return out
 		},
 	}
 }

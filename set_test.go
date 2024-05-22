@@ -863,7 +863,7 @@ func TestPUnion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := lingo.AsParallelEnumerable(tt.source).AsOrdered().Union(lingo.AsParallelEnumerable(tt.args.second).AsOrdered()).ToSlice()
+			got := lingo.AsParallelEnumerable(tt.source).AsOrdered().Concat(lingo.AsParallelEnumerable(tt.source)).Union(lingo.AsParallelEnumerable(tt.args.second).AsOrdered()).ToSlice()
 			if len(got) != len(tt.want) {
 				t.Errorf("%s() = %v, want %v", tt.name, got, tt.want)
 			}
