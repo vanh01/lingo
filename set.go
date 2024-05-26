@@ -355,12 +355,15 @@ func (p ParallelEnumerable[T]) Distinct() ParallelEnumerable[T] {
 			go func() {
 				defer close(out)
 				var m sync.Map
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range temp.getIter() {
 					wg.Add(1)
 					temp := value
 					go func() {
 						defer wg.Done()
+						defer mu.Unlock()
+						mu.Lock()
 						if _, ex := m.Load(temp.val); !ex {
 							m.Store(temp.val, struct{}{})
 							out <- temp
@@ -375,8 +378,8 @@ func (p ParallelEnumerable[T]) Distinct() ParallelEnumerable[T] {
 	}
 }
 
-// Except returns the set difference, which means the elements of one collection
-// that don't appear in a second collection.
+// Except returns the set difference, which means the elements of one parallel sequence
+// that don't appear in a second parallel sequences.
 func (p ParallelEnumerable[T]) Except(second ParallelEnumerable[T]) ParallelEnumerable[T] {
 	return ParallelEnumerable[T]{
 		wasSetUnordered: p.wasSetUnordered,
@@ -405,12 +408,15 @@ func (p ParallelEnumerable[T]) Except(second ParallelEnumerable[T]) ParallelEnum
 					m.Store(k, v)
 				}
 
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range temp.getIter() {
 					wg.Add(1)
 					temp := value
 					go func() {
 						defer wg.Done()
+						defer mu.Unlock()
+						mu.Lock()
 						_, ex := m.Load(temp.val)
 						if !ex {
 							out <- temp
@@ -427,7 +433,7 @@ func (p ParallelEnumerable[T]) Except(second ParallelEnumerable[T]) ParallelEnum
 }
 
 // Intersect returns the set intersection, which means elements
-// that appear in each of two collections.
+// that appear in each of two parallel sequences.
 func (p ParallelEnumerable[T]) Intersect(second ParallelEnumerable[T]) ParallelEnumerable[T] {
 	return ParallelEnumerable[T]{
 		wasSetUnordered: p.wasSetUnordered,
@@ -450,12 +456,15 @@ func (p ParallelEnumerable[T]) Intersect(second ParallelEnumerable[T]) ParallelE
 				for value := range tempSecond.getIter() {
 					m.Store(value.val, true)
 				}
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range temp.getIter() {
 					wg.Add(1)
 					temp := value
 					go func() {
 						defer wg.Done()
+						defer mu.Unlock()
+						mu.Lock()
 						if v, ex := m.Load(temp.val); ex && v.(bool) {
 							m.Store(temp.val, false)
 							out <- temp
@@ -471,7 +480,7 @@ func (p ParallelEnumerable[T]) Intersect(second ParallelEnumerable[T]) ParallelE
 }
 
 // Union returns the set union, which means unique elements that
-// appear in either of two collections.
+// appear in either of two parallel sequences.
 func (p ParallelEnumerable[T]) Union(second ParallelEnumerable[T]) ParallelEnumerable[T] {
 	return ParallelEnumerable[T]{
 		wasSetUnordered: p.wasSetUnordered,
@@ -489,12 +498,15 @@ func (p ParallelEnumerable[T]) Union(second ParallelEnumerable[T]) ParallelEnume
 				var m sync.Map
 				maxNo := make(chan int, 1)
 				maxNo <- -1
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range temp.getIter() {
 					wg.Add(1)
 					temp := value
 					go func() {
 						defer wg.Done()
+						defer mu.Unlock()
+						mu.Lock()
 						if _, ex := m.Load(temp.val); !ex {
 							m.Store(temp.val, struct{}{})
 							out <- temp
