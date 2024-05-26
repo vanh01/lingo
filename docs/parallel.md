@@ -52,6 +52,68 @@ penumerable := lingo.Range(1, 100).AsParallel()
 iter := penumerable.GetIter()
 ```
 
+#### Concat
+Concat concatenates two sequences.
+
+Example:
+```go
+first := lingo.Range(1, 10).AsParallel()
+second := lingo.Range(11, 20).AsParallel()
+first.Concat(second)
+// [2 1 3 5 4 6 8 7 9 10 12 13 11 15 14 16 18 17 19 20]
+```
+
+### Retrieve data
+#### FirstOrNil
+FirstOrNil returns the first element of a parallel sequence (with condition if any), or a nil value if no element is found
+
+Example:
+```go
+penumerable := lingo.Range(1, 10).AsParallel()
+first := penumerable.FirstOrNil() // any element
+```
+#### FirstOrDefault
+FirstOrDefault returns the first element of a parallel sequence (with condition if any), or a default value if no element is found
+
+Example:
+```go
+penumerable := lingo.Empty[int]().AsParallel()
+first := penumerable.FirstOrDefault(-999) // -999
+```
+#### LastOrNil
+LastOrNil returns the last element of a parallel sequence (with condition if any), or a nil value if no element is found
+
+Example:
+```go
+penumerable := lingo.Empty[int]().AsParallel()
+last := enumerabpenumerablele.LastOrNil() // 0
+```
+#### LastOrDefault
+LastOrDefault returns the last element of a parallel sequence (with condition if any), or a default value if no element is found
+
+Example:
+```go
+penumerable := lingo.Empty[int]().AsParallel()
+last := penumerable.LastOrDefault(999) // 999
+```
+#### ElementAtOrNil
+ElementAtOrNil returns the element at a specified index in a parallel sequence or a default value if the index is out of range.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100).AsParallel()
+element := enumerable.ElementAtOrNil(54) // any element
+```
+#### ElementAtOrDefault
+ElementAtOrDefault returns the element at a specified index in a parallel sequence or a default value if the index is out of range.
+
+Example:
+```go
+enumerable := lingo.Range(1, 100).AsParallel()
+element := enumerable.ElementAtOrDefault(100, -1) // -1
+```
+
+
 ### Filtering data
 #### Where
 Where filters in parallel a sequence of values based on a predicate.
@@ -200,6 +262,173 @@ a := lingo.Range(1, 100).AsParallel().Where(func(i int) bool {
 	return i * i
 })
 fmt.Println(a) // 5908.5
+```
+
+### Set operations
+#### Distinct
+Distinct returns distinct elements from a parallel sequence by using the default equality comparer to compare values.
+
+Example:
+
+Get all unique students
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "An"},
+	{Id: 3, Name: "A"},
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "An"},
+	{Id: 3, Name: "A"},
+}
+
+enumerable := lingo.AsParallelEnumerable(source).Distinct()
+fmt.Println(enumerable.ToSlice())
+// Result: [{1 Anh} {2 An} {3 A}] with unordered results
+```
+
+#### Except
+Except returns the set difference, which means the elements of one parallel sequence that don't appear in a second parallel sequences.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+	{Id: 1, Name: "AKh"},
+	{Id: 2, Name: "Lah"},
+	{Id: 3, Name: "A"},
+}
+
+second := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+}
+
+enumerable := lingo.AsParallelEnumerable(source).Except(lingo.AsParallelEnumerable(second))
+fmt.Println(enumerable.ToSlice())
+// Result: [{3 A} {1 AKh} {2 Lah}] with unordered results
+```
+
+#### Intersect
+Intersect returns the set intersection, which means elements that appear in each of two parallel sequences.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+	{Id: 1, Name: "AKh"},
+	{Id: 2, Name: "Lah"},
+	{Id: 3, Name: "A"},
+}
+
+second := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "Ab"},
+	{Id: 1, Name: "Ah"},
+	{Id: 2, Name: "Lbh"},
+	{Id: 3, Name: "B"},
+}
+
+enumerable := lingo.AsParallelEnumerable(source).Intersect(lingo.AsParallelEnumerable(second))
+fmt.Println(enumerable.ToSlice())
+// Result: [{1 Anh} {2 hnA}] with unordered results
+```
+
+#### Union
+Union returns the set union, which means unique elements that appear in either of two parallel sequences.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+}
+
+second := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "Ab"},
+}
+
+enumerable := lingo.AsParallelEnumerable(source).Union(lingo.AsParallelEnumerable(second))
+fmt.Println(enumerable.ToSlice())
+// Result: [{1 Anh} {2 hnA} {3 A} {3 Ab}] with unordered results
+```
+
+### Partitioning data
+#### Skip
+Skip skips a specified number of elements in a parallel sequence and then returns the remaining elements.
+If the source sequence is ordered, Skip skips first n elements. On the other hand, Skip skips any n elements.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+}
+
+enumerable := lingo.AsParallelEnumerable(source).Skip(2)
+fmt.Println(enumerable.ToSlice())
+// Result: [{3 A}] (in somecase)
+```
+#### SkipWhile
+SkipWhile elements in a parallel sequence as long as a specified condition is true and then returns the remaining elements.
+If the source sequence is ordered, SkipWhile skips according to the ordered element. On the other hand, performs SkipWhile on the current arbitrary order.
+
+Example:
+
+```go
+source := []Student{
+    {Id: 1, Name: "Anh"},
+    {Id: 2, Name: "hnA"},
+    {Id: 3, Name: "A"},
+}
+
+enumerable := lingo.AsParallelEnumerable(source).SkipWhile(func(s Student) bool {
+    return s.Id < 2
+})
+fmt.Println(enumerable.ToSlice())
+// Result: [{2 hnA} {1 Anh} {3 A}] (in somecase)
+```
+#### Take
+Take returns a specified number of contiguous elements from the start of a parallel sequence.
+If the source sequence is ordered, Take takes first n elements. On the other hand, Take takes any n elements.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+}
+
+enumerable := lingo.AsParallelEnumerable(source).Take(2)
+fmt.Println(enumerable.ToSlice())
+// Result: [{2 hnA} {1 Anh}] (in somecase)
+```
+#### TakeWhile
+TakeWhile takes elements in a parallel sequence based on a predicate function until an element doesn't satisfy the condition.
+If the source sequence is ordered, TakeWhile takes according to the ordered element. On the other hand, performs TakeWhile on the current arbitrary order.
+
+Example:
+```go
+source := []Student{
+	{Id: 1, Name: "Anh"},
+	{Id: 2, Name: "hnA"},
+	{Id: 3, Name: "A"},
+}
+
+enumerable := lingo.AsParallelEnumerable(source).TakeWhile(func(s Student) bool {
+	return s.Id < 3
+})
+fmt.Println(enumerable.ToSlice())
+// Result: [{2 hnA} {1 Anh}] (in somecase)
 ```
 
 ### Grouping data
