@@ -118,3 +118,107 @@ func (e Enumerable[T]) Reverse() Enumerable[T] {
 		},
 	}
 }
+
+// ParallelEnumerable
+
+// OrderBy sorts in parallel values in ascending order. And then set ordered is true
+//
+// In this method, comparer is returns whether left is smaller than right or not.
+// If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+func (p ParallelEnumerable[T]) OrderBy(selector definition.SingleSelector[T], comparer ...definition.Comparer[any]) ParallelEnumerable[T] {
+	return ParallelEnumerable[T]{
+		wasSetUnordered: true,
+		ordered:         true,
+		getIter: func() <-chan odata[T] {
+			out := make(chan odata[T])
+
+			go func() {
+				defer close(out)
+				origin := p.ToSlice()
+				source := AsParallelEnumerable(origin).AsOrdered().Select(selector).ToSlice()
+				sorter := NewSorter(origin, source, comparer...)
+				sort.Sort(sorter)
+				i := 0
+				for _, value := range sorter.origin {
+					out <- odata[T]{
+						no:  i,
+						val: value,
+					}
+					i++
+				}
+			}()
+
+			return out
+		},
+	}
+}
+
+// OrderByDescending sorts in parallel values in descending order. And then set ordered is true
+//
+// In this method, comparer is returns whether left is smaller than right or not.
+// If comparer is empty or nil, we will use the default comparer. On the other hand, we just use the first comparer
+func (p ParallelEnumerable[T]) OrderByDescending(selector definition.SingleSelector[T], comparer ...definition.Comparer[any]) ParallelEnumerable[T] {
+	return ParallelEnumerable[T]{
+		wasSetUnordered: true,
+		ordered:         true,
+		getIter: func() <-chan odata[T] {
+			out := make(chan odata[T])
+
+			go func() {
+				defer close(out)
+				origin := p.ToSlice()
+				if len(origin) == 0 {
+					return
+				}
+				source := AsParallelEnumerable(origin).AsOrdered().Select(selector).ToSlice()
+				sorter := NewSorter(origin, source, comparer...)
+				oldComparer := sorter.comparer
+				sorter.comparer = func(a1, a2 any) bool {
+					return !oldComparer(a1, a2)
+				}
+				sort.Sort(sorter)
+				i := 0
+				for _, value := range sorter.origin {
+					out <- odata[T]{
+						no:  i,
+						val: value,
+					}
+					i++
+				}
+			}()
+
+			return out
+		},
+	}
+}
+
+// Reverse inverts the order of the elements in a parallel sequence.
+// If this one is Unordered, does nothing.
+func (p ParallelEnumerable[T]) Reverse() ParallelEnumerable[T] {
+	if !p.ordered {
+		return p
+	}
+
+	return ParallelEnumerable[T]{
+		wasSetUnordered: p.wasSetUnordered,
+		ordered:         p.ordered,
+		getIter: func() <-chan odata[T] {
+			out := make(chan odata[T])
+
+			go func() {
+				defer close(out)
+				slice := p.ToSlice()
+				index := 0
+				for i := len(slice) - 1; i >= 0; i-- {
+					out <- odata[T]{
+						no:  index,
+						val: slice[i],
+					}
+					index++
+				}
+			}()
+
+			return out
+		},
+	}
+}
