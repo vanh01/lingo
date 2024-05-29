@@ -26,11 +26,13 @@ lingo is a library written in Go. It is LinQ in .NET for Go. It will help the ar
 	- [Definition](./docs/parallel.md#definition)
 	- [Initialize PLINQ](./docs/parallel.md#initialize-plinq)
 	- [Retrieve data](./docs/parallel.md#retrieve-data)
+	- [Sorting data](./docs/parallel.md#sorting-data)
 	- [Filtering data](./docs/parallel.md#filtering-data)
 	- [Quantifier operations](./docs/parallel.md#quantifier-operations)
 	- [Aggregation operations](./docs/parallel.md#aggregation-operations)
 	- [Set operations](./docs/parallel.md#set-operations)
 	- [Partitioning data](./docs/parallel.md#partitioning-data)
+	- [Join operations](./docs/parallel.md#join-operations)
 	- [Group data](./docs/parallel.md#grouping-data)
 
 ## Getting started
