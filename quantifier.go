@@ -9,22 +9,30 @@ import (
 
 // All determines whether all the elements in a sequence satisfy a condition.
 func (e Enumerable[T]) All(predicate Predicate[T]) bool {
+	result := true
 	for value := range e.getIter() {
+		if !result {
+			continue
+		}
 		if !predicate(value) {
-			return false
+			result = false
 		}
 	}
-	return true
+	return result
 }
 
 // Any determines whether any elements in a sequence satisfy a condition.
 func (e Enumerable[T]) Any(predicate Predicate[T]) bool {
+	result := false
 	for value := range e.getIter() {
+		if result {
+			continue
+		}
 		if predicate(value) {
-			return true
+			result = true
 		}
 	}
-	return false
+	return result
 }
 
 // Contains determines whether a sequence contains a specified element.
@@ -34,18 +42,22 @@ func (e Enumerable[T]) Any(predicate Predicate[T]) bool {
 // If comparer is empty or nil, we will use the default comparer.
 // On the other hand, we just use the first comparer
 func (e Enumerable[T]) Contains(value T, comparer ...definition.Comparer[T]) bool {
+	result := false
 	for v := range e.getIter() {
+		if result {
+			continue
+		}
 		if definition.IsEmptyOrNil(comparer) {
 			if reflect.ValueOf(v).Interface() == reflect.ValueOf(value).Interface() {
-				return true
+				result = true
 			}
 		} else {
 			if comparer[0](v, value) {
-				return true
+				result = true
 			}
 		}
 	}
-	return false
+	return result
 }
 
 // ParallelEnumerable
@@ -69,12 +81,16 @@ func (p ParallelEnumerable[T]) All(predicate Predicate[T]) bool {
 		wg.Wait()
 	}()
 
+	result := true
 	for value := range res {
+		if !result {
+			continue
+		}
 		if !value {
-			return false
+			result = false
 		}
 	}
-	return true
+	return result
 }
 
 // Any determines in parallel whether any element of a sequence satisfies a condition.
@@ -96,12 +112,16 @@ func (p ParallelEnumerable[T]) Any(predicate Predicate[T]) bool {
 		wg.Wait()
 	}()
 
+	result := false
 	for value := range res {
+		if result {
+			continue
+		}
 		if value {
-			return true
+			result = true
 		}
 	}
-	return false
+	return result
 }
 
 // Contains determines in parallel whether a sequence contains a specified element.
@@ -136,10 +156,14 @@ func (p ParallelEnumerable[T]) Contains(value T, comparer ...definition.Comparer
 		wg.Wait()
 	}()
 
+	result := false
 	for value := range res {
+		if result {
+			continue
+		}
 		if value {
-			return true
+			result = true
 		}
 	}
-	return false
+	return result
 }
