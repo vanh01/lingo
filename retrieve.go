@@ -14,15 +14,16 @@ func (e Enumerable[T]) FirstOrNil(predicate ...Predicate[T]) T {
 	var t T
 	first := true
 	for value := range e.getIter() {
+		if !first {
+			continue
+		}
 		if !definition.IsEmptyOrNil(predicate) {
 			if !predicate[0](value) {
 				continue
 			}
 		}
-		if first {
-			first = false
-			t = value
-		}
+		t = value
+		first = false
 	}
 	return t
 }
@@ -35,15 +36,16 @@ func (e Enumerable[T]) FirstOrDefault(defaultValue T, predicate ...Predicate[T])
 	var t T = defaultValue
 	first := true
 	for value := range e.getIter() {
+		if !first {
+			continue
+		}
 		if !definition.IsEmptyOrNil(predicate) {
 			if !predicate[0](value) {
 				continue
 			}
 		}
-		if first {
-			first = false
-			t = value
-		}
+		t = value
+		first = false
 	}
 	return t
 }
@@ -139,15 +141,16 @@ func (p ParallelEnumerable[T]) FirstOrNil(predicate ...Predicate[T]) T {
 				first <- tempFirst
 				wg.Done()
 			}()
+			if !tempFirst {
+				return
+			}
 			if !definition.IsEmptyOrNil(predicate) {
 				if !predicate[0](temp.val) {
 					return
 				}
 			}
-			if tempFirst {
-				tempFirst = false
-				t = temp.val
-			}
+			t = temp.val
+			tempFirst = false
 		}()
 	}
 	wg.Wait()
@@ -177,15 +180,16 @@ func (p ParallelEnumerable[T]) FirstOrDefault(defaultValue T, predicate ...Predi
 				first <- tempFirst
 				wg.Done()
 			}()
+			if !tempFirst {
+				return
+			}
 			if !definition.IsEmptyOrNil(predicate) {
 				if !predicate[0](temp.val) {
 					return
 				}
 			}
-			if tempFirst {
-				tempFirst = false
-				t = temp.val
-			}
+			tempFirst = false
+			t = temp.val
 		}()
 	}
 	wg.Wait()
