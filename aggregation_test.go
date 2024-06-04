@@ -521,53 +521,53 @@ func TestPMinBy(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		args args[any]
+		args args[Student]
 	}{
 		{
 			name: "MinBy",
-			args: args[any]{
-				selector: func(a any) any {
-					return a.(Student).Id
+			args: args[Student]{
+				selector: func(a Student) any {
+					return a.Id
 				},
-				source: lingo.SliceTToAny([]Student{
+				source: []Student{
 					{Id: 1, Name: "1", ClassId: 2},
 					{Id: 3, Name: "11", ClassId: 6},
 					{Id: -2, Name: "12", ClassId: 1},
 					{Id: 8, Name: "13", ClassId: 7},
-				}),
+				},
 				want: Student{Id: -2, Name: "12", ClassId: 1},
 			},
 		},
 		{
 			name: "MinBy",
-			args: args[any]{
-				selector: func(a any) any {
-					return a.(Student).Id
+			args: args[Student]{
+				selector: func(a Student) any {
+					return a.Id
 				},
-				source: lingo.SliceTToAny([]Student{
+				source: []Student{
 					{Id: 1, Name: "1", ClassId: 2},
 					{Id: 3, Name: "11", ClassId: 6},
 					{Id: 2, Name: "12", ClassId: 1},
 					{Id: 8, Name: "13", ClassId: 7},
-				}),
+				},
 				want: Student{Id: 1, Name: "1", ClassId: 2},
 			},
 		},
 		{
 			name: "MinBy",
-			args: args[any]{
-				selector: func(a any) any {
-					return a.(Student).Name
+			args: args[Student]{
+				selector: func(a Student) any {
+					return a.Name
 				},
 				comparer: func(a1, a2 any) bool {
 					return len(a1.(string)) < len(a2.(string))
 				},
-				source: lingo.SliceTToAny([]Student{
+				source: []Student{
 					{Id: 1, Name: "1", ClassId: 2},
 					{Id: 3, Name: "11", ClassId: 6},
 					{Id: -2, Name: "", ClassId: 1},
 					{Id: 8, Name: "13", ClassId: 7},
-				}),
+				},
 				want: Student{Id: -2, Name: "", ClassId: 1},
 			},
 		},
@@ -590,59 +590,59 @@ func TestPMaxBy(t *testing.T) {
 	}
 	type args[T any] struct {
 		selector definition.SingleSelector[T]
-		comparer definition.Comparer[T]
+		comparer definition.Comparer[any]
 		source   []T
 		want     T
 	}
 	tests := []struct {
 		name string
-		args args[any]
+		args args[Student]
 	}{
 		{
 			name: "MaxBy",
-			args: args[any]{
-				selector: func(a any) any {
-					return a.(Student).Id
+			args: args[Student]{
+				selector: func(a Student) any {
+					return a.Id
 				},
-				source: lingo.SliceTToAny([]Student{
+				source: []Student{
 					{Id: 1, Name: "1", ClassId: 2},
 					{Id: 3, Name: "11", ClassId: 6},
 					{Id: 22, Name: "12", ClassId: 1},
 					{Id: 8, Name: "13", ClassId: 7},
-				}),
+				},
 				want: Student{Id: 22, Name: "12", ClassId: 1},
 			},
 		},
 		{
 			name: "MaxBy",
-			args: args[any]{
-				selector: func(a any) any {
-					return a.(Student).Id
+			args: args[Student]{
+				selector: func(a Student) any {
+					return a.Id
 				},
-				source: lingo.SliceTToAny([]Student{
+				source: []Student{
 					{Id: 10, Name: "1", ClassId: 2},
 					{Id: 3, Name: "11", ClassId: 6},
 					{Id: 2, Name: "12", ClassId: 1},
 					{Id: 8, Name: "13", ClassId: 7},
-				}),
+				},
 				want: Student{Id: 10, Name: "1", ClassId: 2},
 			},
 		},
 		{
 			name: "MaxBy",
-			args: args[any]{
-				selector: func(a any) any {
-					return a.(Student).Name
+			args: args[Student]{
+				selector: func(a Student) any {
+					return a.Name
 				},
 				comparer: func(a1, a2 any) bool {
 					return len(a1.(string)) > len(a2.(string))
 				},
-				source: lingo.SliceTToAny([]Student{
+				source: []Student{
 					{Id: 1, Name: "1", ClassId: 2},
 					{Id: 3, Name: "111", ClassId: 6},
 					{Id: -2, Name: "", ClassId: 1},
 					{Id: 8, Name: "13", ClassId: 7},
-				}),
+				},
 				want: Student{Id: 3, Name: "111", ClassId: 6},
 			},
 		},
