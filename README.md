@@ -48,8 +48,9 @@ go get -u github.com/vanh01/lingo
 ```
 
 ### Quick Start
-
+<details><summary>Example</summary>
 For example, I want to get top 3 students in a class whose name contains "1"
+
 ```go
 package main
 
@@ -112,6 +113,7 @@ func main() {
 }
 // Result: [{9 J 10 1} {4 D 7 1} {1 A 6 1}]
 ```
+</details>
 
 ## Features
 
@@ -121,58 +123,58 @@ The following table classifies each supported method, there are two types: Immed
 - Immediate execution terminates an enumerable and returns the result
 - Chain execution can be called many times.
 
-| Standard query operator | Return type | Immediate execution | Chain execution |
-|-|-|-|-|
-|[Min](./docs/aggregation.md#min)|T|x||
-|[MinBy](./docs/aggregation.md#minby)|T|x||
-|[Max](./docs/aggregation.md#max)|T|x||
-|[MaxBy](./docs/aggregation.md#maxby)|T|x||
-|[Sum](./docs/aggregation.md#sum)|Number|x||
-|[Average](./docs/aggregation.md#average)|float64|x||
-|[Count](./docs/aggregation.md#count)|int64|x||
-|[Aggregate](./docs/aggregation.md#aggregate)|any|x||
-|[ToSlice](./docs/converter.md#toslice)|[]T|x||
-|[ToMap](./docs/converter.md#tomap)|map[any]any|x||
-|[Concat](./docs/enumerable.md#concat)|Enumerable[T]||x|
-|[Where](./docs/filter.md#filtering-data)|Enumerable[T]||x|
-|[GroupBy](./docs/group.md#grouping-data)|Enumerable[any]||x|
-|[Join](./docs/join.md#join-operations)|Enumerable[any]||x|
-|[Skip](./docs/partition.md#skip)|Enumerable[T]||x|
-|[SkipWhile](./docs/partition.md#skipwhile)|Enumerable[T]||x|
-|[Take](./docs/partition.md#take)|Enumerable[T]||x|
-|[TakeWhile](./docs/partition.md#takewhile)|Enumerable[T]||x|
-|[Select](./docs/projection.md#select)|Enumerable[any]||x|
-|[SelectMany](./docs/projection.md#selectmany)|Enumerable[any]||x|
-|[Zip](./docs/projection.md#zip)|Enumerable[any]||x|
-|[All](./docs/quantifier.md#all)|bool|x||
-|[Any](./docs/quantifier.md#any)|bool|x||
-|[Contains](./docs/quantifier.md#contains)|bool|x||
-|[FirstOrNil](./docs/retrieve.md#firstornil)|T|x||
-|[FirstOrDefault](./docs/retrieve.md#firstordefault)|T|x||
-|[LastOrNil](./docs/retrieve.md#lastornil)|T|x||
-|[LastOrDefault](./docs/retrieve.md#lastordefault)|T|x||
-|[ElementAtOrNil](./docs/retrieve.md#elementatornil)|T|x||
-|[ElementAtOrDefault](./docs/retrieve.md#elementatordefault)|T|x||
-|[Distinct](./docs/set.md#distinct)|Enumerable[T]||x|
-|[DistinctBy](./docs/set.md#distinctby)|Enumerable[T]||x|
-|[Except](./docs/set.md#except)|Enumerable[T]||x|
-|[ExceptBy](./docs/set.md#exceptby)|Enumerable[T]||x|
-|[Intersect](./docs/set.md#intersect)|Enumerable[T]||x|
-|[IntersectBy](./docs/set.md#intersectby)|Enumerable[T]||x|
-|[Union](./docs/set.md#union)|Enumerable[T]||x|
-|[UnionBy](./docs/set.md#unionby)|Enumerable[T]||x|
-|[OrderBy](./docs/sort.md#orderby)|Enumerable[T]||x|
-|[OrderByDescending](./docs/sort.md#orderbydescending)|Enumerable[T]||x|
-|[Reverse](./docs/sort.md#reverse)|Enumerable[T]||x|
-|[Append](./docs/modification.md#append)|Enumerable[T]||x|
-|[AppendRange](./docs/modification.md#appendrange)|Enumerable[T]||x|
-|[Prepend](./docs/modification.md#prepend)|Enumerable[T]||x|
-|[PrependRange](./docs/modification.md#prependrange)|Enumerable[T]||x|
-|[Clear](./docs/modification.md#clear)|Enumerable[T]||x|
-|[Insert](./docs/modification.md#insert)|Enumerable[T]||x|
-|[Remove](./docs/modification.md#remove)|Enumerable[T]||x|
-|[RemoveAt](./docs/modification.md#removeat)|Enumerable[T]||x|
-|[RemoveRange](./docs/modification.md#removerange)|Enumerable[T]||x|
+| Standard query operator | Return type | Immediate execution | Chain execution | Parallel support |
+|-|-|-|-|-|
+|[Min](./docs/enumerable/aggregation.md#min)|T|x|||
+|[MinBy](./docs/enumerable/aggregation.md#minby)|T|x||x|
+|[Max](./docs/enumerable/aggregation.md#max)|T|x|||
+|[MaxBy](./docs/enumerable/aggregation.md#maxby)|T|x||x|
+|[Sum](./docs/enumerable/aggregation.md#sum)|Number|x||x|
+|[Average](./docs/enumerable/aggregation.md#average)|float64|x||x|
+|[Count](./docs/enumerable/aggregation.md#count)|int64|x|||
+|[Aggregate](./docs/enumerable/aggregation.md#aggregate)|any|x|||
+|[ToSlice](./docs/enumerable/converter.md#toslice)|[]T|x||x|
+|[ToMap](./docs/enumerable/converter.md#tomap)|map[any]any|x||x|
+|[Concat](./docs/enumerable/enumerable.md#concat)|Enumerable[T]||x|x|
+|[Where](./docs/enumerable/filter.md#filtering-data)|Enumerable[T]||x|x|
+|[GroupBy](./docs/enumerable/group.md#grouping-data)|Enumerable[any]||x|x|
+|[Join](./docs/enumerable/join.md#join-operations)|Enumerable[any]||x|x|
+|[Skip](./docs/enumerable/partition.md#skip)|Enumerable[T]||x|x|
+|[SkipWhile](./docs/enumerable/partition.md#skipwhile)|Enumerable[T]||x|x|
+|[Take](./docs/enumerable/partition.md#take)|Enumerable[T]||x|x|
+|[TakeWhile](./docs/enumerable/partition.md#takewhile)|Enumerable[T]||x|x|
+|[Select](./docs/enumerable/projection.md#select)|Enumerable[any]||x|x|
+|[SelectMany](./docs/enumerable/projection.md#selectmany)|Enumerable[any]||x|x|
+|[Zip](./docs/enumerable/projection.md#zip)|Enumerable[any]||x|x|
+|[All](./docs/enumerable/quantifier.md#all)|bool|x||x|
+|[Any](./docs/enumerable/quantifier.md#any)|bool|x||x|
+|[Contains](./docs/enumerable/quantifier.md#contains)|bool|x||x|
+|[FirstOrNil](./docs/enumerable/retrieve.md#firstornil)|T|x||x|
+|[FirstOrDefault](./docs/enumerable/retrieve.md#firstordefault)|T|x||x|
+|[LastOrNil](./docs/enumerable/retrieve.md#lastornil)|T|x||x|
+|[LastOrDefault](./docs/enumerable/retrieve.md#lastordefault)|T|x||x|
+|[ElementAtOrNil](./docs/enumerable/retrieve.md#elementatornil)|T|x||x|
+|[ElementAtOrDefault](./docs/enumerable/retrieve.md#elementatordefault)|T|x||x|
+|[Distinct](./docs/enumerable/set.md#distinct)|Enumerable[T]||x|x|
+|[DistinctBy](./docs/enumerable/set.md#distinctby)|Enumerable[T]||x||
+|[Except](./docs/enumerable/set.md#except)|Enumerable[T]||x|x|
+|[ExceptBy](./docs/enumerable/set.md#exceptby)|Enumerable[T]||x||
+|[Intersect](./docs/enumerable/set.md#intersect)|Enumerable[T]||x|x|
+|[IntersectBy](./docs/enumerable/set.md#intersectby)|Enumerable[T]||x||
+|[Union](./docs/enumerable/set.md#union)|Enumerable[T]||x|x|
+|[UnionBy](./docs/enumerable/set.md#unionby)|Enumerable[T]||x|x|
+|[OrderBy](./docs/enumerable/sort.md#orderby)|Enumerable[T]||x|x|
+|[OrderByDescending](./docs/enumerable/sort.md#orderbydescending)|Enumerable[T]||x|x|
+|[Reverse](./docs/enumerable/sort.md#reverse)|Enumerable[T]||x|x|
+|[Append](./docs/enumerable/modification.md#append)|Enumerable[T]||x||
+|[AppendRange](./docs/enumerable/modification.md#appendrange)|Enumerable[T]||x||
+|[Prepend](./docs/enumerable/modification.md#prepend)|Enumerable[T]||x||
+|[PrependRange](./docs/enumerable/modification.md#prependrange)|Enumerable[T]||x||
+|[Clear](./docs/enumerable/modification.md#clear)|Enumerable[T]||x||
+|[Insert](./docs/enumerable/modification.md#insert)|Enumerable[T]||x||
+|[Remove](./docs/enumerable/modification.md#remove)|Enumerable[T]||x||
+|[RemoveAt](./docs/enumerable/modification.md#removeat)|Enumerable[T]||x||
+|[RemoveRange](./docs/enumerable/modification.md#removerange)|Enumerable[T]||x||
 
 I have defined the Student structure for the following examples
 
@@ -191,7 +193,7 @@ type Class struct {
 ```
 Following are all the examples related to the supported methods in this library.
 
-Please click [here](./docs/enumerable.md)
+Please click [here](./docs/enumerable/enumerable.md)
 
 ## Reference
 - [LinQ](https://learn.microsoft.com/en-us/dotnet/csharp/linq/)
