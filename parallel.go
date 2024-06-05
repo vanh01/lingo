@@ -106,25 +106,25 @@ func (p ParallelEnumerable[T]) Concat(second ParallelEnumerable[T]) ParallelEnum
 			go func() {
 				defer close(out)
 
-				maxNo := make(chan int, 1)
-				maxNo <- -1
+				maxNo := -1
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range p.getIter() {
 					wg.Add(1)
 					temp := value
 					go func() {
+						defer mu.Unlock()
 						defer wg.Done()
-						tempMaxNo := <-maxNo
-						if tempMaxNo < temp.no {
-							tempMaxNo = temp.no
+						mu.Lock()
+						if maxNo < temp.no {
+							maxNo = temp.no
 						}
-						maxNo <- tempMaxNo
 						out <- temp
 					}()
 				}
 				wg.Wait()
 
-				startNo := <-maxNo + 1
+				startNo := maxNo + 1
 
 				var wg1 sync.WaitGroup
 				for value := range second.getIter() {
