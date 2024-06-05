@@ -496,8 +496,7 @@ func (p ParallelEnumerable[T]) Union(second ParallelEnumerable[T]) ParallelEnume
 			go func() {
 				defer close(out)
 				var m sync.Map
-				maxNo := make(chan int, 1)
-				maxNo <- -1
+				maxNo := -1
 				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range temp.getIter() {
@@ -510,17 +509,15 @@ func (p ParallelEnumerable[T]) Union(second ParallelEnumerable[T]) ParallelEnume
 						if _, ex := m.Load(temp.val); !ex {
 							m.Store(temp.val, struct{}{})
 							out <- temp
-							tempMaxNo := <-maxNo
-							if tempMaxNo < temp.no {
-								tempMaxNo = temp.no
+							if maxNo < temp.no {
+								maxNo = temp.no
 							}
-							maxNo <- tempMaxNo
 						}
 					}()
 				}
 				wg.Wait()
 
-				startNo := <-maxNo + 1
+				startNo := maxNo + 1
 
 				tempSecond := second
 				if second.ordered {

@@ -129,19 +129,19 @@ func (p ParallelEnumerable[T]) FirstOrNil(predicate ...Predicate[T]) T {
 	}
 
 	var t T
-	first := make(chan bool, 1)
-	first <- true
+	first := true
+	var mu sync.Mutex
 	var wg sync.WaitGroup
 	for value := range p.getIter() {
 		wg.Add(1)
 		temp := value
 		go func() {
-			tempFirst := <-first
 			defer func() {
-				first <- tempFirst
+				mu.Unlock()
 				wg.Done()
 			}()
-			if !tempFirst {
+			mu.Lock()
+			if !first {
 				return
 			}
 			if !definition.IsEmptyOrNil(predicate) {
@@ -150,7 +150,7 @@ func (p ParallelEnumerable[T]) FirstOrNil(predicate ...Predicate[T]) T {
 				}
 			}
 			t = temp.val
-			tempFirst = false
+			first = false
 		}()
 	}
 	wg.Wait()
@@ -168,19 +168,19 @@ func (p ParallelEnumerable[T]) FirstOrDefault(defaultValue T, predicate ...Predi
 	}
 
 	var t T = defaultValue
-	first := make(chan bool, 1)
-	first <- true
+	first := true
+	var mu sync.Mutex
 	var wg sync.WaitGroup
 	for value := range p.getIter() {
 		wg.Add(1)
 		temp := value
 		go func() {
-			tempFirst := <-first
+			mu.Lock()
 			defer func() {
-				first <- tempFirst
+				mu.Unlock()
 				wg.Done()
 			}()
-			if !tempFirst {
+			if !first {
 				return
 			}
 			if !definition.IsEmptyOrNil(predicate) {
@@ -188,7 +188,7 @@ func (p ParallelEnumerable[T]) FirstOrDefault(defaultValue T, predicate ...Predi
 					return
 				}
 			}
-			tempFirst = false
+			first = false
 			t = temp.val
 		}()
 	}
@@ -278,20 +278,20 @@ func (p ParallelEnumerable[T]) ElementAtOrNil(index int64) T {
 	}
 
 	var t T
-	i := make(chan int64, 1)
-	i <- 0
+	var i int64 = 0
+	var mu sync.Mutex
 	for value := range p.getIter() {
 		temp := value
 		go func() {
-			tempi := <-i
-			if tempi <= index {
+			defer mu.Unlock()
+			mu.Lock()
+			if i <= index {
 				t = temp.val
-				tempi++
+				i++
 			}
-			i <- tempi
 		}()
 	}
-	if <-i != index+1 {
+	if i != index+1 {
 		var tt T
 		return tt
 	}
@@ -305,20 +305,20 @@ func (p ParallelEnumerable[T]) ElementAtOrDefault(index int64, defaultValue T) T
 	}
 
 	var t T = defaultValue
-	i := make(chan int64, 1)
-	i <- 0
+	var i int64 = 0
+	var mu sync.Mutex
 	for value := range p.getIter() {
 		temp := value
 		go func() {
-			tempi := <-i
-			if tempi <= index {
+			defer mu.Unlock()
+			mu.Lock()
+			if i <= index {
 				t = temp.val
-				tempi++
+				i++
 			}
-			i <- tempi
 		}()
 	}
-	if <-i != index+1 {
+	if i != index+1 {
 		return defaultValue
 	}
 	return t

@@ -148,19 +148,20 @@ func (p ParallelEnumerable[T]) Skip(number int) ParallelEnumerable[T] {
 				}
 
 				// in case the ParallelEnumerable is unordered
-				i := make(chan int, 1)
-				i <- 1
+				i := 1
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range p.getIter() {
 					wg.Add(1)
 					temp := value
 					go func() {
+						defer mu.Unlock()
 						defer wg.Done()
-						tempi := <-i
-						if tempi > number {
+						mu.Lock()
+						if i > number {
 							out <- temp
 						}
-						i <- tempi + 1
+						i++
 					}()
 				}
 				wg.Wait()
@@ -199,22 +200,22 @@ func (p ParallelEnumerable[T]) SkipWhile(predicate Predicate[T]) ParallelEnumera
 				}
 
 				// in case the ParallelEnumerable is unordered
-				stopped := make(chan bool, 1)
-				stopped <- false
+				stopped := false
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range p.getIter() {
 					temp := value
 					wg.Add(1)
 					go func() {
+						defer mu.Unlock()
 						defer wg.Done()
-						tempStopped := <-stopped
-						if !tempStopped && !predicate(temp.val) {
-							tempStopped = true
+						mu.Lock()
+						if !stopped && !predicate(temp.val) {
+							stopped = true
 						}
-						if tempStopped {
+						if stopped {
 							out <- temp
 						}
-						stopped <- tempStopped
 					}()
 				}
 				wg.Wait()
@@ -251,19 +252,20 @@ func (p ParallelEnumerable[T]) Take(number int) ParallelEnumerable[T] {
 				}
 
 				// in case the ParallelEnumerable is unordered
-				i := make(chan int, 1)
-				i <- 0
+				i := 0
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range p.getIter() {
 					wg.Add(1)
 					temp := value
 					go func() {
+						defer mu.Unlock()
 						defer wg.Done()
-						tempi := <-i
-						if tempi < number {
+						mu.Lock()
+						if i < number {
 							out <- temp
 						}
-						i <- tempi + 1
+						i++
 					}()
 				}
 				wg.Wait()
@@ -301,22 +303,22 @@ func (p ParallelEnumerable[T]) TakeWhile(predicate Predicate[T]) ParallelEnumera
 				}
 
 				// in case the ParallelEnumerable is unordered
-				stopped := make(chan bool, 1)
-				stopped <- false
+				stopped := false
+				var mu sync.Mutex
 				var wg sync.WaitGroup
 				for value := range p.getIter() {
 					temp := value
 					wg.Add(1)
 					go func() {
+						defer mu.Unlock()
 						defer wg.Done()
-						tempStopped := <-stopped
-						if !tempStopped && !predicate(temp.val) {
-							tempStopped = true
+						mu.Lock()
+						if !stopped && !predicate(temp.val) {
+							stopped = true
 						}
-						if !tempStopped {
+						if !stopped {
 							out <- temp
 						}
-						stopped <- tempStopped
 					}()
 				}
 				wg.Wait()
